@@ -6,66 +6,90 @@
 <title>NR Group</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#0b0b0b;color:white}
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+font-family:Arial;
+background:#0b0b0b;
+color:white;
+}
 
 /* HEADER */
 header{
 position:fixed;
-width:100%;
 top:0;
+width:100%;
 display:flex;
 justify-content:space-between;
 align-items:center;
-padding:20px;
-background:rgba(0,0,0,0.8);
+padding:15px 30px;
+background:rgba(0,0,0,0.85);
 z-index:1000;
+}
+
+header nav{
+display:flex;
+gap:20px;
 }
 
 header a{
 color:white;
-margin-left:15px;
 text-decoration:none;
-}
-
-.btn{
-background:#c9a857;
-padding:10px 20px;
-border-radius:5px;
-color:black;
-border:none;
-cursor:pointer;
+font-size:14px;
 }
 
 /* HERO */
 .hero{
-height:80vh;
+height:70vh;
 background:url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c') center/cover;
 display:flex;
 align-items:center;
 justify-content:center;
 text-align:center;
+padding-top:60px;
+}
+
+.hero h1{
+font-size:32px;
 }
 
 /* SECTION */
 .section{
-padding:100px 20px 40px;
+padding:120px 20px 40px;
 text-align:center;
 }
 
 /* FILTROS */
+.filtros{
+display:flex;
+justify-content:center;
+gap:10px;
+flex-wrap:wrap;
+margin-bottom:30px;
+}
+
 input{
 padding:10px;
-margin:5px;
-border-radius:5px;
+border-radius:6px;
 border:none;
+width:200px;
+}
+
+.btn{
+background:#c9a857;
+color:black;
+border:none;
+padding:10px 15px;
+border-radius:6px;
+cursor:pointer;
 }
 
 /* CARDS */
 .cards{
 display:flex;
 flex-wrap:wrap;
-gap:20px;
 justify-content:center;
+gap:20px;
 }
 
 .card{
@@ -74,23 +98,51 @@ padding:15px;
 border-radius:10px;
 width:300px;
 cursor:pointer;
-transition:0.3s;
+transition:.3s;
+text-align:left;
 }
 
-.card:hover{transform:translateY(-5px)}
+.card:hover{
+transform:translateY(-5px);
+}
 
 .card img{
 width:100%;
 height:200px;
 object-fit:cover;
 border-radius:10px;
+margin-bottom:10px;
 }
 
-.price{color:#c9a857;font-weight:bold}
+.price{
+color:#c9a857;
+font-weight:bold;
+margin-top:5px;
+}
 
+/* MOBILE */
 @media(max-width:768px){
-.hero{height:50vh}
-.card{width:90%}
+
+header{
+padding:10px 15px;
+}
+
+.hero{
+height:50vh;
+}
+
+.hero h1{
+font-size:22px;
+}
+
+.card{
+width:90%;
+}
+
+input{
+width:100%;
+}
+
 }
 </style>
 </head>
@@ -110,9 +162,9 @@ border-radius:10px;
 
 <section id="propiedades" class="section">
 
-<h2>Propiedades</h2>
+<h2 style="margin-bottom:20px;">Propiedades</h2>
 
-<div>
+<div class="filtros">
   <input type="text" id="filtroCiudad" placeholder="Ciudad">
   <input type="number" id="filtroPrecio" placeholder="Precio máximo">
   <button onclick="filtrar()" class="btn">Buscar</button>
@@ -125,26 +177,66 @@ border-radius:10px;
 <script>
 let data=[];
 
-async function cargarPropiedades(){
-  const res=await fetch("https://script.google.com/macros/s/AKfycbwWFcQ1nlVsLyiEOFMvSbYAxPHdAqSvKP1qMCvp1BrQkhb6ctod8oSShrj1cBKWzSc/exec?action=read_propiedades");
-  const json=await res.json();
-  data=json.data;
-  render(data);
+async function cargar(){
+const res=await fetch("https://script.google.com/macros/s/AKfycbwWFcQ1nlVsLyiEOFMvSbYAxPHdAqSvKP1qMCvp1BrQkhb6ctod8oSShrj1cBKWzSc/exec?action=read_propiedades");
+const json=await res.json();
+data=json.data;
+render(data);
 }
 
-function optimizar(url,size=600){
-  if(url.includes("res.cloudinary.com")){
-    return url.replace("/upload/", `/upload/w_${size},q_auto,f_auto/`);
-  }
-  return url;
+function optimizar(url){
+if(url.includes("res.cloudinary.com")){
+return url.replace("/upload/","/upload/w_600,q_auto,f_auto/");
+}
+return url;
 }
 
 function render(lista){
-  const c=document.getElementById("propiedades-container");
-  c.innerHTML="";
+const c=document.getElementById("propiedades-container");
+c.innerHTML="";
 
-  lista.forEach(p=>{
-    let img=p.FOTO1||"https://images.unsplash.com/photo-1560448204-e02f11c3d0e2";
+lista.forEach(p=>{
+let img=p.FOTO1 || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2";
+
+const precio=p.PRECIO 
+? new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP'}).format(p.PRECIO)
+: "Consultar";
+
+c.innerHTML+=`
+<div class="card" onclick='ver(${JSON.stringify(p)})'>
+<img src="${optimizar(img)}">
+<h3>${p.TITULO}</h3>
+<p>${p.CIUDAD}</p>
+<p class="price">${precio}</p>
+</div>
+`;
+});
+}
+
+function ver(p){
+localStorage.setItem("propiedad",JSON.stringify(p));
+window.location.href="propiedad.html";
+}
+
+function filtrar(){
+const ciudad=document.getElementById("filtroCiudad").value.toLowerCase();
+const precio=document.getElementById("filtroPrecio").value;
+
+const f=data.filter(p=>{
+return(
+(!ciudad||p.CIUDAD?.toLowerCase().includes(ciudad)) &&
+(!precio||p.PRECIO<=precio)
+);
+});
+
+render(f);
+}
+
+cargar();
+</script>
+
+</body>
+</html>    let img=p.FOTO1||"https://images.unsplash.com/photo-1560448204-e02f11c3d0e2";
 
     const precio=p.PRECIO 
       ? new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP'}).format(p.PRECIO)
