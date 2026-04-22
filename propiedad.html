@@ -2,46 +2,119 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Detalle propiedad</title>
 
 <style>
-body{font-family:Arial;background:#0b0b0b;color:white;margin:0}
-.container{max-width:900px;margin:40px auto;padding:20px}
-
-.slider img{
-width:100%;
-height:400px;
-object-fit:cover;
-border-radius:12px;
+body{
+  font-family:Arial;
+  background:#0b0b0b;
+  color:white;
+  margin:0;
 }
 
+/* CONTENEDOR */
+.container{
+  max-width:900px;
+  margin:40px auto;
+  padding:20px;
+}
+
+/* SLIDER */
+.slider{
+  position:relative;
+}
+
+.slider img{
+  width:100%;
+  height:420px;
+  object-fit:cover;
+  border-radius:12px;
+}
+
+/* FLECHAS */
+.flecha{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  background:rgba(0,0,0,0.6);
+  color:white;
+  border:none;
+  font-size:25px;
+  padding:10px;
+  cursor:pointer;
+  border-radius:50%;
+}
+
+.flecha.izq{left:10px}
+.flecha.der{right:10px}
+
+/* MINIATURAS */
 .miniaturas{
-display:flex;
-gap:10px;
-margin-top:10px;
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+  overflow-x:auto;
 }
 
 .miniaturas img{
-width:80px;
-height:60px;
-object-fit:cover;
-border-radius:6px;
-cursor:pointer;
-opacity:0.7;
+  width:90px;
+  height:65px;
+  object-fit:cover;
+  border-radius:6px;
+  cursor:pointer;
+  opacity:0.7;
 }
 
-.miniaturas img:hover{opacity:1}
+.miniaturas img:hover{
+  opacity:1;
+}
 
-.price{color:#c9a857;font-size:28px;font-weight:bold}
+/* TEXTO */
+h1{margin-top:15px}
+.ciudad{color:#aaa}
 
+.price{
+  color:#c9a857;
+  font-size:28px;
+  font-weight:bold;
+  margin:10px 0;
+}
+
+.descripcion{
+  line-height:1.6;
+}
+
+/* BOTÓN */
 .btn{
-background:#25D366;
-color:white;
-padding:15px 25px;
-display:inline-block;
-margin-top:30px;
-text-decoration:none;
-border-radius:8px;
+  background:#25D366;
+  color:white;
+  padding:15px 25px;
+  display:inline-block;
+  margin-top:30px;
+  text-decoration:none;
+  border-radius:8px;
+}
+
+/* MODAL ZOOM */
+.modal{
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:black;
+  justify-content:center;
+  align-items:center;
+  z-index:999;
+}
+
+.modal img{
+  max-width:90%;
+  max-height:90%;
+  transition:transform 0.3s;
+  cursor:zoom-in;
 }
 </style>
 </head>
@@ -52,46 +125,108 @@ border-radius:8px;
   <div id="contenido"></div>
 </div>
 
+<div class="modal" id="modal" onclick="cerrarZoom()">
+  <img id="imgZoom">
+</div>
+
 <script>
 const p = JSON.parse(localStorage.getItem("propiedad"));
 
-let imagen = p.FOTO1 || "";
+/* LISTA DE FOTOS */
+const fotos = [
+  p.FOTO1,p.FOTO2,p.FOTO3,p.FOTO4,
+  p.FOTO5,p.FOTO6,p.FOTO7,p.FOTO8,
+  p.FOTO9,p.FOTO10
+].filter(f => f && f.startsWith("http"));
 
-if (imagen.includes("res.cloudinary.com")) {
-  imagen = imagen.replace("/upload/", "/upload/w_900,q_auto,f_auto/");
+let index = 0;
+
+/* OPTIMIZAR */
+function optimizar(url,size=900){
+  if(url.includes("res.cloudinary.com")){
+    return url.replace("/upload/", `/upload/w_${size},q_auto,f_auto/`);
+  }
+  return url;
 }
 
 const precio = p.PRECIO 
   ? new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP'}).format(p.PRECIO)
   : "Consultar";
 
+/* MINIATURAS */
+const miniaturasHTML = fotos.map((f,i)=>{
+  return `<img src="${optimizar(f,200)}" onclick="irImagen(${i})">`;
+}).join("");
+
 document.getElementById("contenido").innerHTML = `
   <div class="slider">
-    <img id="imgPrincipal" src="${imagen}">
+    <button class="flecha izq" onclick="prev()">←</button>
+    <img id="imgPrincipal" src="${optimizar(fotos[0])}" onclick="abrirZoom()">
+    <button class="flecha der" onclick="next()">→</button>
   </div>
 
   <div class="miniaturas">
-    ${p.FOTO1 ? `<img src="${p.FOTO1}" onclick="cambiarImagen('${p.FOTO1}')">` : ''}
-    ${p.FOTO2 ? `<img src="${p.FOTO2}" onclick="cambiarImagen('${p.FOTO2}')">` : ''}
-    ${p.FOTO3 ? `<img src="${p.FOTO3}" onclick="cambiarImagen('${p.FOTO3}')">` : ''}
-    ${p.FOTO4 ? `<img src="${p.FOTO4}" onclick="cambiarImagen('${p.FOTO4}')">` : ''}
+    ${miniaturasHTML}
   </div>
 
   <h1>${p.TITULO}</h1>
-  <p>${p.CIUDAD}</p>
+  <p class="ciudad">${p.CIUDAD}</p>
   <p class="price">${precio}</p>
 
-  <a class="btn" href="https://wa.me/573016492983?text=Hola estoy interesado en ${p.TITULO} en ${p.CIUDAD} por ${precio}">
+  <p class="descripcion">${p.DESCRIPCION || ''}</p>
+
+  <a class="btn" href="https://wa.me/573016492983?text=Hola estoy interesado en ${p.TITULO}">
     Contactar por WhatsApp
   </a>
 `;
 
-function cambiarImagen(src){
-  if (src.includes("res.cloudinary.com")) {
-    src = src.replace("/upload/", "/upload/w_900,q_auto,f_auto/");
-  }
-  document.getElementById("imgPrincipal").src = src;
+/* CAMBIAR IMAGEN */
+function irImagen(i){
+  index = i;
+  document.getElementById("imgPrincipal").src = optimizar(fotos[index]);
 }
+
+function next(){
+  index = (index + 1) % fotos.length;
+  irImagen(index);
+}
+
+function prev(){
+  index = (index - 1 + fotos.length) % fotos.length;
+  irImagen(index);
+}
+
+/* SWIPE */
+let startX = 0;
+
+document.getElementById("contenido").addEventListener("touchstart", e=>{
+  startX = e.touches[0].clientX;
+});
+
+document.getElementById("contenido").addEventListener("touchend", e=>{
+  let endX = e.changedTouches[0].clientX;
+  if(startX - endX > 50) next();
+  if(endX - startX > 50) prev();
+});
+
+/* ZOOM */
+function abrirZoom(){
+  document.getElementById("modal").style.display="flex";
+  document.getElementById("imgZoom").src = document.getElementById("imgPrincipal").src;
+}
+
+function cerrarZoom(){
+  document.getElementById("modal").style.display="none";
+}
+
+/* ZOOM SCROLL */
+let zoom = 1;
+document.getElementById("imgZoom").addEventListener("wheel", e=>{
+  e.preventDefault();
+  zoom += e.deltaY * -0.001;
+  zoom = Math.min(Math.max(1, zoom), 3);
+  e.target.style.transform = `scale(${zoom})`;
+});
 </script>
 
 </body>
