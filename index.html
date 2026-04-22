@@ -236,44 +236,4 @@ cargar();
 </script>
 
 </body>
-</html>    let img=p.FOTO1||"https://images.unsplash.com/photo-1560448204-e02f11c3d0e2";
-
-    const precio=p.PRECIO 
-      ? new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP'}).format(p.PRECIO)
-      : "Consultar";
-
-    c.innerHTML+=`
-      <div class="card" onclick='verPropiedad(${JSON.stringify(p)})'>
-        <img src="${optimizar(img)}">
-        <h3>${p.TITULO}</h3>
-        <p>${p.CIUDAD}</p>
-        <p class="price">${precio}</p>
-      </div>
-    `;
-  });
-}
-
-function verPropiedad(p){
-  localStorage.setItem("propiedad",JSON.stringify(p));
-  window.location.href="propiedad.html";
-}
-
-function filtrar(){
-  const ciudad=document.getElementById("filtroCiudad").value.toLowerCase();
-  const precio=document.getElementById("filtroPrecio").value;
-
-  const f=data.filter(p=>{
-    return(
-      (!ciudad||p.CIUDAD?.toLowerCase().includes(ciudad)) &&
-      (!precio||p.PRECIO<=precio)
-    );
-  });
-
-  render(f);
-}
-
-cargarPropiedades();
-</script>
-
-</body>
 </html>
