@@ -124,8 +124,6 @@ header{flex-direction:column}
   <div class="hero-content">
     <h1>Encuentra más que una propiedad, <span class="gold">encuentra tu lugar en Pereira</span></h1>
     <p>Estrategia inmobiliaria impulsada por medios digitales</p>
-    <br>
-    <a href="https://crmnovigroup.vercel.app/" class="btn">Ver propiedades</a>
   </div>
 </section>
 
@@ -143,8 +141,6 @@ header{flex-direction:column}
   
   <div id="propiedades-container" class="cards"></div>
 
-  <br><br>
-  <a href="https://crmnovigroup.vercel.app/" class="btn">Ver todas las propiedades</a>
 </section>
 
 <section class="cta">
@@ -172,29 +168,36 @@ async function cargarPropiedades() {
     const res = await fetch("https://script.google.com/macros/s/AKfycbwWFcQ1nlVsLyiEOFMvSbYAxPHdAqSvKP1qMCvp1BrQkhb6ctod8oSShrj1cBKWzSc/exec?action=read_propiedades");
     
     const json = await res.json();
-
-    console.log(json); // 👈 para ver datos en consola
-
-    if (json.status !== "success") {
-      throw new Error("No hay datos");
-    }
-
     const data = json.data;
+
     const container = document.getElementById("propiedades-container");
     container.innerHTML = "";
 
     data.forEach(p => {
 
-      // 🔥 DETECTA AUTOMÁTICAMENTE IMAGEN
-      const imagen = p.FOTO1 || p.IMAGEN || p.imagen || p.foto || p.url || "";
+      let imagen = p.FOTO1 || p.IMAGEN || p.imagen || "";
+
+      // 🔥 OPTIMIZACIÓN CLOUDINARY AUTOMÁTICA
+      if (imagen.includes("res.cloudinary.com")) {
+        imagen = imagen.replace("/upload/", "/upload/w_600,q_auto,f_auto/");
+      }
+
+      // fallback
+      if (!imagen) {
+        imagen = "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2";
+      }
 
       const precio = p.PRECIO 
-        ? new Intl.NumberFormat('es-CO', {style: 'currency', currency: 'COP', maximumFractionDigits: 0}).format(p.PRECIO)
+        ? new Intl.NumberFormat('es-CO', {
+            style: 'currency',
+            currency: 'COP',
+            maximumFractionDigits: 0
+          }).format(p.PRECIO)
         : "Consultar";
 
       const card = `
         <div class="card">
-          <img src="${imagen || 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2'}">
+          <img src="${imagen}" onerror="this.src='https://images.unsplash.com/photo-1560448204-e02f11c3d0e2'">
           <h3>${p.TITULO || 'Propiedad'}</h3>
           <p>${p.CIUDAD || ''}</p>
           <p class="price">${precio}</p>
@@ -205,7 +208,7 @@ async function cargarPropiedades() {
     });
 
   } catch (error) {
-    console.log("Error cargando propiedades:", error);
+    console.log("Error:", error);
   }
 }
 
