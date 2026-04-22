@@ -177,12 +177,11 @@ async function cargarPropiedades() {
 
       let imagen = p.FOTO1 || p.IMAGEN || p.imagen || "";
 
-      // 🔥 OPTIMIZACIÓN CLOUDINARY AUTOMÁTICA
+      // optimizar cloudinary
       if (imagen.includes("res.cloudinary.com")) {
         imagen = imagen.replace("/upload/", "/upload/w_600,q_auto,f_auto/");
       }
 
-      // fallback
       if (!imagen) {
         imagen = "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2";
       }
