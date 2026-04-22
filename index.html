@@ -195,7 +195,7 @@ async function cargarPropiedades() {
         : "Consultar";
 
       const card = `
-        <div class="card">
+        <div class="card" onclick="verPropiedad('${encodeURIComponent(JSON.stringify(p))}')">
           <img src="${imagen}" onerror="this.src='https://images.unsplash.com/photo-1560448204-e02f11c3d0e2'">
           <h3>${p.TITULO || 'Propiedad'}</h3>
           <p>${p.CIUDAD || ''}</p>
@@ -210,7 +210,10 @@ async function cargarPropiedades() {
     console.log("Error:", error);
   }
 }
-
+function verPropiedad(propiedad) {
+  localStorage.setItem("propiedad", propiedad);
+  window.location.href = "propiedad.html";
+}
 cargarPropiedades();
 </script>
 
