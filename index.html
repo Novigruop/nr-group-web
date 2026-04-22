@@ -7,32 +7,103 @@
 
 <style>
 body{font-family:Arial;background:#0b0b0b;color:white;margin:0}
-.section{padding:40px;text-align:center}
-.cards{display:flex;flex-wrap:wrap;gap:20px;justify-content:center}
-.card{background:#111;padding:15px;border-radius:10px;width:280px;cursor:pointer}
-.card img{width:100%;height:180px;object-fit:cover;border-radius:10px}
-.price{color:#c9a857;font-weight:bold}
 
-input,button{
+/* HEADER */
+header{
+position:fixed;
+width:100%;
+top:0;
+display:flex;
+justify-content:space-between;
+padding:20px 40px;
+background:rgba(0,0,0,0.8);
+z-index:1000;
+}
+
+.btn{
+background:#c9a857;
+padding:10px 20px;
+border-radius:5px;
+color:black;
+cursor:pointer;
+border:none;
+}
+
+/* HERO */
+.hero{
+height:80vh;
+background:url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c') center/cover;
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
+}
+
+/* SECCION */
+.section{
+padding:100px 20px 40px;
+text-align:center;
+}
+
+/* FILTROS */
+input{
 padding:10px;
 margin:5px;
 border-radius:5px;
 border:none;
 }
-button{background:#c9a857;cursor:pointer}
+
+/* CARDS */
+.cards{
+display:flex;
+gap:20px;
+justify-content:center;
+flex-wrap:wrap;
+}
+
+.card{
+background:#111;
+padding:15px;
+border-radius:10px;
+width:300px;
+cursor:pointer;
+transition:0.3s;
+}
+
+.card:hover{transform:translateY(-5px)}
+
+.card img{
+width:100%;
+height:200px;
+object-fit:cover;
+border-radius:10px;
+}
+
+.price{
+color:#c9a857;
+font-weight:bold;
+}
 </style>
 </head>
 
 <body>
 
-<section class="section">
+<header>
+  <h2>NR Group</h2>
+</header>
+
+<section class="hero">
+  <h1>Encuentra tu propiedad ideal</h1>
+</section>
+
+<section id="propiedades" class="section">
 
 <h2>Propiedades</h2>
 
 <div>
   <input type="text" id="filtroCiudad" placeholder="Ciudad">
   <input type="number" id="filtroPrecio" placeholder="Precio máximo">
-  <button onclick="filtrar()">Buscar</button>
+  <button onclick="filtrar()" class="btn">Buscar</button>
 </div>
 
 <div id="propiedades-container" class="cards"></div>
@@ -42,63 +113,63 @@ button{background:#c9a857;cursor:pointer}
 <script>
 let data = [];
 
-async function cargarPropiedades() {
+async function cargarPropiedades(){
   const res = await fetch("https://script.google.com/macros/s/AKfycbwWFcQ1nlVsLyiEOFMvSbYAxPHdAqSvKP1qMCvp1BrQkhb6ctod8oSShrj1cBKWzSc/exec?action=read_propiedades");
   const json = await res.json();
   data = json.data;
-  renderPropiedades(data);
+  render(data);
 }
 
-function renderPropiedades(lista){
+function optimizar(url,size=600){
+  if(url.includes("res.cloudinary.com")){
+    return url.replace("/upload/", `/upload/w_${size},q_auto,f_auto/`);
+  }
+  return url;
+}
+
+function render(lista){
   const container = document.getElementById("propiedades-container");
-  container.innerHTML = "";
+  container.innerHTML="";
 
-  lista.forEach(p => {
-
+  lista.forEach(p=>{
     let imagen = p.FOTO1 || "";
 
-    if (imagen.includes("res.cloudinary.com")) {
-      imagen = imagen.replace("/upload/", "/upload/w_600,q_auto,f_auto/");
-    }
-
-    if (!imagen) {
-      imagen = "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2";
+    if(!imagen){
+      imagen="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2";
     }
 
     const precio = p.PRECIO 
       ? new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP'}).format(p.PRECIO)
       : "Consultar";
 
-    const card = `
+    container.innerHTML += `
       <div class="card" onclick='verPropiedad(${JSON.stringify(p)})'>
-        <img src="${imagen}">
+        <img src="${optimizar(imagen)}">
         <h3>${p.TITULO}</h3>
         <p>${p.CIUDAD}</p>
         <p class="price">${precio}</p>
       </div>
     `;
-
-    container.innerHTML += card;
   });
 }
 
 function verPropiedad(p){
   localStorage.setItem("propiedad", JSON.stringify(p));
-  window.location.href = "propiedad.html";
+  window.location.href="propiedad.html";
 }
 
 function filtrar(){
   const ciudad = document.getElementById("filtroCiudad").value.toLowerCase();
   const precioMax = document.getElementById("filtroPrecio").value;
 
-  const filtrados = data.filter(p => {
+  const filtrados = data.filter(p=>{
     return (
       (!ciudad || p.CIUDAD?.toLowerCase().includes(ciudad)) &&
       (!precioMax || p.PRECIO <= precioMax)
     );
   });
 
-  renderPropiedades(filtrados);
+  render(filtrados);
 }
 
 cargarPropiedades();
