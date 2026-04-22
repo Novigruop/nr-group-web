@@ -27,10 +27,15 @@ background:rgba(0,0,0,0.85);
 z-index:1000;
 }
 
+.header nav{
+display:flex;
+gap:15px;
+}
+
 .header a{
 color:white;
 text-decoration:none;
-margin-left:10px;
+font-size:14px;
 }
 
 /* CONTENEDOR */
@@ -41,6 +46,10 @@ padding:20px;
 }
 
 /* SLIDER */
+.slider{
+position:relative;
+}
+
 .slider img{
 width:100%;
 height:350px;
@@ -48,7 +57,23 @@ object-fit:cover;
 border-radius:10px;
 }
 
-/* MINI */
+/* FLECHAS */
+.flecha{
+position:absolute;
+top:50%;
+transform:translateY(-50%);
+background:rgba(0,0,0,0.5);
+color:white;
+border:none;
+padding:10px;
+border-radius:50%;
+cursor:pointer;
+}
+
+.izq{left:10px}
+.der{right:10px}
+
+/* MINIATURAS */
 .miniaturas{
 display:flex;
 gap:8px;
@@ -67,6 +92,11 @@ opacity:.7;
 
 .miniaturas img:hover{opacity:1}
 
+/* INFO */
+.info{
+margin-top:20px;
+}
+
 .price{
 color:#c9a857;
 font-size:24px;
@@ -82,6 +112,12 @@ border-radius:6px;
 margin-top:20px;
 text-decoration:none;
 }
+
+/* MOBILE */
+@media(max-width:768px){
+.slider img{height:250px}
+.container{padding:15px}
+}
 </style>
 </head>
 
@@ -89,9 +125,10 @@ text-decoration:none;
 
 <div class="header">
   <div><b>NR Group</b></div>
-  <div>
+  <nav>
     <a href="index.html">Inicio</a>
-  </div>
+    <a href="index.html#propiedades">Propiedades</a>
+  </nav>
 </div>
 
 <div class="container">
@@ -101,31 +138,32 @@ text-decoration:none;
 <script>
 let p = null;
 
-/* 1️⃣ INTENTAR LOCALSTORAGE */
 try{
   p = JSON.parse(localStorage.getItem("propiedad"));
 }catch(e){}
 
-/* 2️⃣ SI NO HAY → MOSTRAR ERROR */
+/* SI NO HAY DATOS */
 if(!p){
-  document.getElementById("contenido").innerHTML = `
-    <h2>⚠️ No se pudo cargar la propiedad</h2>
-    <p>Debes ingresar desde el listado</p>
-    <br>
-    <a href="index.html" class="btn">Volver al inicio</a>
-  `;
-  throw new Error("No hay propiedad en localStorage");
+document.getElementById("contenido").innerHTML=`
+<h2>⚠️ No se pudo cargar la propiedad</h2>
+<p>Ingresa desde el listado</p>
+<br>
+<a href="index.html" class="btn">Volver</a>
+`;
+throw new Error("Sin datos");
 }
 
-/* DEBUG */
-console.log("Propiedad cargada:", p);
-
-/* FOTOS */
+/* FOTOS SEGURAS */
 const fotos = [
 p.FOTO1,p.FOTO2,p.FOTO3,p.FOTO4,
 p.FOTO5,p.FOTO6,p.FOTO7,p.FOTO8,
 p.FOTO9,p.FOTO10
-].filter(f=>f);
+].filter(f => f && f.startsWith("http"));
+
+/* SI NO HAY FOTOS */
+if(fotos.length === 0){
+fotos.push("https://images.unsplash.com/photo-1560448204-e02f11c3d0e2");
+}
 
 let index = 0;
 
@@ -148,13 +186,16 @@ const thumbs = fotos.map((f,i)=>`
 `).join("");
 
 /* RENDER */
-document.getElementById("contenido").innerHTML = `
+document.getElementById("contenido").innerHTML=`
 <div class="slider">
+<button class="flecha izq" onclick="prev()">←</button>
 <img id="img" src="${opt(fotos[0])}">
+<button class="flecha der" onclick="next()">→</button>
 </div>
 
 <div class="miniaturas">${thumbs}</div>
 
+<div class="info">
 <h1>${p.TITULO || "Sin título"}</h1>
 <p>${p.CIUDAD || ""}</p>
 <p class="price">${precio}</p>
@@ -162,11 +203,26 @@ document.getElementById("contenido").innerHTML = `
 <a class="btn" href="https://wa.me/573016492983?text=Hola estoy interesado en ${p.TITULO}">
 WhatsApp
 </a>
+</div>
 `;
 
 /* FUNCIONES */
 function ir(i){
 index=i;
+update();
+}
+
+function next(){
+index=(index+1)%fotos.length;
+update();
+}
+
+function prev(){
+index=(index-1+fotos.length)%fotos.length;
+update();
+}
+
+function update(){
 document.getElementById("img").src = opt(fotos[index]);
 }
 </script>
