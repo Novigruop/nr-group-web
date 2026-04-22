@@ -3,218 +3,104 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NR Group | Real Estate & Media</title>
+<title>NR Group</title>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial;background:#0b0b0b;color:white}
-
-header{
-position:fixed;
-width:100%;
-top:0;
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:20px 40px;
-background:rgba(0,0,0,0.8);
-backdrop-filter:blur(10px);
-z-index:1000;
-}
-header a{color:white;text-decoration:none;margin:0 15px}
-.btn{
-background:#c9a857;
-color:black;
-padding:10px 20px;
-border-radius:5px;
-font-weight:bold;
-}
-
-.hero{
-height:100vh;
-background:url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c') center/cover;
-display:flex;
-align-items:center;
-padding:60px;
-position:relative;
-}
-.hero::before{
-content:'';
-position:absolute;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.6);
-top:0;left:0;
-}
-.hero-content{
-position:relative;
-max-width:600px;
-}
-.hero h1{font-size:50px;margin-bottom:20px}
-.gold{color:#c9a857}
-
-.section{padding:80px 40px;text-align:center}
-.cards{
-display:flex;
-gap:20px;
-justify-content:center;
-flex-wrap:wrap;
-}
-.card{
-background:#111;
-padding:15px;
-border-radius:10px;
-width:300px;
-transition:0.3s;
-}
-.card:hover{transform:translateY(-5px)}
-.card img{width:100%;border-radius:10px;height:200px;object-fit:cover}
+body{font-family:Arial;background:#0b0b0b;color:white;margin:0}
+.section{padding:40px;text-align:center}
+.cards{display:flex;flex-wrap:wrap;gap:20px;justify-content:center}
+.card{background:#111;padding:15px;border-radius:10px;width:280px;cursor:pointer}
+.card img{width:100%;height:180px;object-fit:cover;border-radius:10px}
 .price{color:#c9a857;font-weight:bold}
 
-.benefits{
-display:flex;
-justify-content:center;
-gap:30px;
-flex-wrap:wrap;
+input,button{
+padding:10px;
+margin:5px;
+border-radius:5px;
+border:none;
 }
-
-.cta{
-background:#111;
-padding:60px;
-}
-
-footer{
-background:black;
-padding:30px;
-text-align:center;
-color:#aaa;
-}
-
-.whatsapp{
-position:fixed;
-bottom:20px;
-right:20px;
-background:#25D366;
-padding:15px;
-border-radius:50%;
-font-size:20px;
-text-decoration:none;
-}
-
-@media(max-width:768px){
-.hero h1{font-size:32px}
-header{flex-direction:column}
-}
+button{background:#c9a857;cursor:pointer}
 </style>
 </head>
 
 <body>
 
-<header>
-  <div><strong>NR Group</strong></div>
-  <nav>
-    <a href="#inicio">Inicio</a>
-    <a href="#propiedades">Propiedades</a>
-    <a href="#contacto">Contacto</a>
-  </nav>
-  <a href="https://wa.me/573016492983" class="btn">WhatsApp</a>
-</header>
-
-<section id="inicio" class="hero">
-  <div class="hero-content">
-    <h1>Encuentra más que una propiedad, <span class="gold">encuentra tu lugar en Pereira</span></h1>
-    <p>Estrategia inmobiliaria impulsada por medios digitales</p>
-  </div>
-</section>
-
 <section class="section">
-  <h2>¿Por qué NR Group?</h2>
-  <div class="benefits">
-    <div>✔️ Propiedades verificadas</div>
-    <div>✔️ Estrategia digital</div>
-    <div>✔️ Acompañamiento total</div>
-  </div>
-</section>
 
-<section id="propiedades" class="section">
-  <h2>Propiedades destacadas</h2>
-  
-  <div id="propiedades-container" class="cards"></div>
+<h2>Propiedades</h2>
+
+<div>
+  <input type="text" id="filtroCiudad" placeholder="Ciudad">
+  <input type="number" id="filtroPrecio" placeholder="Precio máximo">
+  <button onclick="filtrar()">Buscar</button>
+</div>
+
+<div id="propiedades-container" class="cards"></div>
 
 </section>
-
-<section class="cta">
-  <h2>¿Quieres vender tu propiedad?</h2>
-  <p>Recibe asesoría personalizada</p>
-  <br>
-  <a href="https://wa.me/573016492983" class="btn">Hablar por WhatsApp</a>
-</section>
-
-<section id="contacto" class="section">
-  <h2>Contáctanos</h2>
-  <p>Pereira - Risaralda</p>
-  <p>📞 301 649 2983</p>
-</section>
-
-<a href="https://wa.me/573016492983" class="whatsapp">💬</a>
-
-<footer>
-  NR Group Real Estate & Media © 2026
-</footer>
 
 <script>
+let data = [];
+
 async function cargarPropiedades() {
-  try {
-    const res = await fetch("https://script.google.com/macros/s/AKfycbwWFcQ1nlVsLyiEOFMvSbYAxPHdAqSvKP1qMCvp1BrQkhb6ctod8oSShrj1cBKWzSc/exec?action=read_propiedades");
-    
-    const json = await res.json();
-    const data = json.data;
-
-    const container = document.getElementById("propiedades-container");
-    container.innerHTML = "";
-
-    data.forEach(p => {
-
-      let imagen = p.FOTO1 || p.IMAGEN || p.imagen || "";
-      console.log(p);
-
-      // optimizar cloudinary
-      if (imagen.includes("res.cloudinary.com")) {
-        imagen = imagen.replace("/upload/", "/upload/w_600,q_auto,f_auto/");
-      }
-
-      if (!imagen) {
-        imagen = "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2";
-      }
-
-      const precio = p.PRECIO 
-        ? new Intl.NumberFormat('es-CO', {
-            style: 'currency',
-            currency: 'COP',
-            maximumFractionDigits: 0
-          }).format(p.PRECIO)
-        : "Consultar";
-
-      const card = `
-        <div class="card" onclick='verPropiedad(${JSON.stringify(p)})'
-          <img src="${imagen}" onerror="this.src='https://images.unsplash.com/photo-1560448204-e02f11c3d0e2'">
-          <h3>${p.TITULO || 'Propiedad'}</h3>
-          <p>${p.CIUDAD || ''}</p>
-          <p class="price">${precio}</p>
-        </div>
-      `;
-
-      container.innerHTML += card;
-    });
-
-  } catch (error) {
-    console.log("Error:", error);
-  }
+  const res = await fetch("https://script.google.com/macros/s/AKfycbwWFcQ1nlVsLyiEOFMvSbYAxPHdAqSvKP1qMCvp1BrQkhb6ctod8oSShrj1cBKWzSc/exec?action=read_propiedades");
+  const json = await res.json();
+  data = json.data;
+  renderPropiedades(data);
 }
-function verPropiedad(propiedad) {
-  localStorage.setItem("propiedad", JSON.stringify(propiedad));
+
+function renderPropiedades(lista){
+  const container = document.getElementById("propiedades-container");
+  container.innerHTML = "";
+
+  lista.forEach(p => {
+
+    let imagen = p.FOTO1 || "";
+
+    if (imagen.includes("res.cloudinary.com")) {
+      imagen = imagen.replace("/upload/", "/upload/w_600,q_auto,f_auto/");
+    }
+
+    if (!imagen) {
+      imagen = "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2";
+    }
+
+    const precio = p.PRECIO 
+      ? new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP'}).format(p.PRECIO)
+      : "Consultar";
+
+    const card = `
+      <div class="card" onclick='verPropiedad(${JSON.stringify(p)})'>
+        <img src="${imagen}">
+        <h3>${p.TITULO}</h3>
+        <p>${p.CIUDAD}</p>
+        <p class="price">${precio}</p>
+      </div>
+    `;
+
+    container.innerHTML += card;
+  });
+}
+
+function verPropiedad(p){
+  localStorage.setItem("propiedad", JSON.stringify(p));
   window.location.href = "propiedad.html";
 }
+
+function filtrar(){
+  const ciudad = document.getElementById("filtroCiudad").value.toLowerCase();
+  const precioMax = document.getElementById("filtroPrecio").value;
+
+  const filtrados = data.filter(p => {
+    return (
+      (!ciudad || p.CIUDAD?.toLowerCase().includes(ciudad)) &&
+      (!precioMax || p.PRECIO <= precioMax)
+    );
+  });
+
+  renderPropiedades(filtrados);
+}
+
 cargarPropiedades();
 </script>
 
