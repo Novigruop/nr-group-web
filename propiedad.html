@@ -2,10 +2,17 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Detalle propiedad</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#0b0b0b;color:white}
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+font-family:Arial;
+background:#0b0b0b;
+color:white;
+}
 
 /* HEADER */
 .header{
@@ -14,37 +21,38 @@ top:0;
 width:100%;
 display:flex;
 justify-content:space-between;
+align-items:center;
 padding:15px 20px;
-background:rgba(0,0,0,0.8);
+background:rgba(0,0,0,0.85);
 z-index:1000;
 }
 
-.header a{color:white;text-decoration:none;margin-left:10px}
+.header nav{
+display:flex;
+gap:15px;
+}
 
-/* VOLVER */
-.btn-volver{
-position:fixed;
-top:60px;
-left:20px;
-background:#111;
-padding:8px 12px;
-border-radius:6px;
-cursor:pointer;
+.header a{
+color:white;
+text-decoration:none;
+font-size:14px;
 }
 
 /* CONTENIDO */
 .container{
 max-width:900px;
-margin:100px auto;
+margin:90px auto;
 padding:20px;
 }
 
 /* SLIDER */
-.slider{position:relative}
+.slider{
+position:relative;
+}
 
 .slider img{
 width:100%;
-height:400px;
+height:350px;
 object-fit:cover;
 border-radius:10px;
 }
@@ -54,12 +62,12 @@ border-radius:10px;
 position:absolute;
 top:50%;
 transform:translateY(-50%);
-background:rgba(0,0,0,0.6);
+background:rgba(0,0,0,0.5);
 color:white;
 border:none;
 padding:10px;
-cursor:pointer;
 border-radius:50%;
+cursor:pointer;
 }
 
 .izq{left:10px}
@@ -68,38 +76,54 @@ border-radius:50%;
 /* MINIATURAS */
 .miniaturas{
 display:flex;
-gap:10px;
+gap:8px;
 margin-top:10px;
 overflow-x:auto;
 }
 
 .miniaturas img{
-width:80px;
-height:60px;
+width:70px;
+height:50px;
 object-fit:cover;
 border-radius:5px;
 cursor:pointer;
-opacity:0.7;
+opacity:.7;
 }
 
 .miniaturas img:hover{opacity:1}
 
-.price{color:#c9a857;font-size:26px;font-weight:bold}
+/* INFO */
+.info{
+margin-top:20px;
+}
+
+.price{
+color:#c9a857;
+font-size:24px;
+margin:10px 0;
+}
 
 .btn{
 background:#25D366;
 padding:12px 20px;
 color:white;
 display:inline-block;
+border-radius:6px;
 margin-top:20px;
 text-decoration:none;
-border-radius:6px;
 }
 
-/* RESPONSIVE */
+/* MOBILE */
 @media(max-width:768px){
-.slider img{height:250px}
-.container{padding:15px}
+
+.slider img{
+height:250px;
+}
+
+.container{
+padding:15px;
+}
+
 }
 </style>
 </head>
@@ -107,14 +131,12 @@ border-radius:6px;
 <body>
 
 <div class="header">
-  <div>NR Group</div>
-  <div>
+  <div><b>NR Group</b></div>
+  <nav>
     <a href="index.html">Inicio</a>
     <a href="index.html#propiedades">Propiedades</a>
-  </div>
+  </nav>
 </div>
-
-<div class="btn-volver" onclick="volver()">← Volver</div>
 
 <div class="container">
   <div id="contenido"></div>
@@ -139,9 +161,9 @@ p.FOTO9,p.FOTO10
 
 let index=0;
 
-function optimizar(url,size=900){
+function opt(url){
 if(url.includes("res.cloudinary.com")){
-return url.replace("/upload/",`/upload/w_${size},q_auto,f_auto/`);
+return url.replace("/upload/","/upload/w_900,q_auto,f_auto/");
 }
 return url;
 }
@@ -150,17 +172,18 @@ const precio=p.PRECIO
 ? new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP'}).format(p.PRECIO)
 : "Consultar";
 
-const thumbs=fotos.map((f,i)=>`<img src="${optimizar(f,150)}" onclick="ir(${i})">`).join("");
+const thumbs=fotos.map((f,i)=>`<img src="${opt(f)}" onclick="ir(${i})">`).join("");
 
 document.getElementById("contenido").innerHTML=`
 <div class="slider">
 <button class="flecha izq" onclick="prev()">←</button>
-<img id="img" src="${optimizar(fotos[0])}">
+<img id="img" src="${opt(fotos[0])}">
 <button class="flecha der" onclick="next()">→</button>
 </div>
 
 <div class="miniaturas">${thumbs}</div>
 
+<div class="info">
 <h1>${p.TITULO}</h1>
 <p>${p.CIUDAD}</p>
 <p class="price">${precio}</p>
@@ -168,14 +191,13 @@ document.getElementById("contenido").innerHTML=`
 <a class="btn" href="https://wa.me/573016492983?text=Hola estoy interesado en ${p.TITULO}">
 WhatsApp
 </a>
+</div>
 `;
 
 function ir(i){index=i;update();}
 function next(){index=(index+1)%fotos.length;update();}
 function prev(){index=(index-1+fotos.length)%fotos.length;update();}
-function update(){document.getElementById("img").src=optimizar(fotos[index]);}
-
-function volver(){window.history.back();}
+function update(){document.getElementById("img").src=opt(fotos[index]);}
 </script>
 
 </body>
