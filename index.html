@@ -7,38 +7,98 @@
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Arial;background:#0b0b0b;color:white}
 
-/* HEADER */
-header{
+body{
+font-family:Arial;
+background:#0b0b0b;
+color:white;
+padding-top:80px;
+}
+
+/* NAVBAR */
+.navbar{
 position:fixed;
 top:0;
 width:100%;
+background:#111;
 display:flex;
 justify-content:space-between;
 align-items:center;
-padding:15px 30px;
-background:rgba(0,0,0,0.85);
+padding:15px 40px;
 z-index:1000;
 }
 
-header nav{display:flex;gap:20px}
-header a{color:white;text-decoration:none}
+.logo{
+font-weight:bold;
+font-size:18px;
+}
+
+/* MENU */
+.menu{
+list-style:none;
+display:flex;
+gap:30px;
+align-items:center;
+}
+
+.menu li{
+position:relative;
+cursor:pointer;
+}
+
+.menu a{
+color:white;
+text-decoration:none;
+}
+
+/* DROPDOWN */
+.submenu{
+position:absolute;
+top:40px;
+left:0;
+background:white;
+color:black;
+list-style:none;
+padding:15px;
+border-radius:12px;
+display:none;
+min-width:180px;
+box-shadow:0 10px 25px rgba(0,0,0,0.3);
+}
+
+.submenu li{
+padding:8px;
+border-radius:6px;
+}
+
+.submenu li:hover{
+background:#f2f2f2;
+}
+
+.dropdown:hover .submenu{
+display:block;
+}
 
 /* HERO */
 .hero{
-height:70vh;
+height:60vh;
 background:url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c') center/cover;
 display:flex;
 align-items:center;
 justify-content:center;
 text-align:center;
-padding-top:60px;
+}
+
+.hero h1{
+font-size:40px;
+background:rgba(0,0,0,0.6);
+padding:20px;
+border-radius:10px;
 }
 
 /* SECTION */
 .section{
-padding:120px 20px 40px;
+padding:40px 20px;
 text-align:center;
 }
 
@@ -65,8 +125,8 @@ border:none;
 padding:10px 15px;
 border-radius:6px;
 cursor:pointer;
-display:inline-block;
 text-decoration:none;
+display:inline-block;
 }
 
 /* CARDS */
@@ -93,7 +153,10 @@ object-fit:cover;
 border-radius:10px;
 }
 
-.price{color:#c9a857;font-weight:bold}
+.price{
+color:#c9a857;
+font-weight:bold;
+}
 
 /* PREMIUM */
 .premium{
@@ -131,26 +194,64 @@ box-shadow:0 5px 15px rgba(0,0,0,0.3);
 z-index:9999;
 }
 
+/* MOBILE */
 @media(max-width:768px){
+.menu{
+flex-direction:column;
+gap:10px;
+}
 .card{width:90%}
+.hero h1{font-size:24px}
 }
 </style>
 </head>
 
 <body>
 
-<header>
-  <div><b>NR Group</b></div>
-  <nav>
-    <a href="#propiedades">Propiedades</a>
-  </nav>
+<!-- NAVBAR -->
+<header class="navbar">
+  <div class="logo">NR Group</div>
+
+  <ul class="menu">
+    <li><a href="#">Nosotros</a></li>
+
+    <li class="dropdown">
+      <a href="#">Arriendo ▾</a>
+      <ul class="submenu">
+        <li>Apartamentos</li>
+        <li>Apartaestudios</li>
+        <li>Bodegas</li>
+        <li>Casas</li>
+        <li>Locales</li>
+        <li>Oficinas</li>
+      </ul>
+    </li>
+
+    <li class="dropdown">
+      <a href="#">Venta ▾</a>
+      <ul class="submenu">
+        <li>Apartamentos</li>
+        <li>Apartaestudios</li>
+        <li>Bodegas</li>
+        <li>Casas</li>
+        <li>Locales</li>
+        <li>Oficinas</li>
+      </ul>
+    </li>
+
+    <li><a href="#">Servicios</a></li>
+    <li><a href="#">Blog</a></li>
+    <li><a href="#">Contacto</a></li>
+  </ul>
 </header>
 
+<!-- HERO -->
 <section class="hero">
-  <h1>Encuentra tu propiedad ideal</h1>
+  <h1>Inmobiliaria en Pereira</h1>
 </section>
 
-<section id="propiedades" class="section">
+<!-- PROPIEDADES -->
+<section class="section">
 
 <h2>Propiedades</h2>
 
@@ -164,7 +265,7 @@ z-index:9999;
 
 </section>
 
-<!-- BOTON WHATSAPP -->
+<!-- WHATSAPP -->
 <a href="https://wa.me/573016492983" target="_blank" class="wa-float">💬</a>
 
 <script>
