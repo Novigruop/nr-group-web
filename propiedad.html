@@ -8,69 +8,48 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box}
-
-body{
-font-family:Arial;
-background:#0b0b0b;
-color:white;
-}
+body{font-family:Arial;background:#0b0b0b;color:white;margin:0}
 
 /* HEADER */
 .header{
 position:fixed;
 top:0;
 width:100%;
-background:rgba(0,0,0,0.9);
-padding:15px 30px;
+background:#111;
+padding:15px 20px;
 display:flex;
 justify-content:space-between;
 align-items:center;
 z-index:1000;
 }
 
-.header a{
-color:white;
-text-decoration:none;
-margin-left:20px;
-}
-
-/* BOTON VOLVER */
 .volver{
-background:#1a1a1a;
-padding:8px 14px;
-border-radius:8px;
+background:#222;
+padding:8px 12px;
+border-radius:6px;
 cursor:pointer;
 }
 
 /* CONTENEDOR */
 .container{
-max-width:1000px;
-margin:100px auto 40px;
+max-width:900px;
+margin:100px auto;
 padding:20px;
 }
 
-/* CARD */
 .card{
 background:#111;
 padding:20px;
-border-radius:14px;
-box-shadow:0 10px 30px rgba(0,0,0,0.5);
-}
-
-/* SLIDER */
-.slider{
-position:relative;
+border-radius:10px;
 }
 
 .slider img{
 width:100%;
-height:420px;
+height:400px;
 object-fit:cover;
-border-radius:12px;
+border-radius:10px;
 }
 
-/* MINI */
 .miniaturas{
 display:flex;
 gap:8px;
@@ -79,65 +58,56 @@ overflow-x:auto;
 }
 
 .miniaturas img{
-width:90px;
-height:65px;
+width:80px;
+height:60px;
 object-fit:cover;
-border-radius:6px;
+border-radius:5px;
 cursor:pointer;
 opacity:.7;
-transition:0.3s;
-}
-
-.miniaturas img:hover{
-opacity:1;
-transform:scale(1.05);
-}
-
-/* INFO */
-h1{
-margin-top:20px;
-font-size:28px;
 }
 
 .price{
-font-size:24px;
-margin:10px 0;
 color:#c9a857;
-font-weight:bold;
+font-size:22px;
+margin:10px 0;
 }
 
-.desc{
-margin-top:10px;
-line-height:1.6;
-color:#ddd;
-}
-
-/* BOTONES */
 .actions{
-margin-top:25px;
+margin-top:20px;
 display:flex;
 gap:10px;
 flex-wrap:wrap;
 }
 
 .btn{
-padding:12px 18px;
+padding:10px 15px;
 border:none;
-border-radius:8px;
+border-radius:6px;
 cursor:pointer;
-font-size:14px;
-font-weight:bold;
 }
 
 .copy{background:#333;color:white}
 .whatsapp{background:#25D366;color:white}
 .pdf{background:#c9a857;color:black}
 
-/* MOBILE */
-@media(max-width:768px){
-.slider img{height:250px}
-.container{margin-top:90px}
+/* WHATSAPP FLOAT */
+.wa-float{
+position:fixed;
+bottom:20px;
+right:20px;
+background:#25D366;
+color:white;
+font-size:24px;
+width:60px;
+height:60px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:50%;
+text-decoration:none;
+z-index:9999;
 }
+
 </style>
 </head>
 
@@ -145,9 +115,6 @@ font-weight:bold;
 
 <div class="header">
   <div class="volver" onclick="history.back()">← Volver</div>
-  <div>
-    <a href="index.html">Inicio</a>
-  </div>
 </div>
 
 <div class="container" id="ficha">
@@ -156,133 +123,76 @@ font-weight:bold;
   </div>
 </div>
 
+<a href="https://wa.me/573016492983" target="_blank" class="wa-float">💬</a>
+
 <script>
 
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 
-if(!id){
-document.getElementById("contenido").innerHTML="<h2>Error: sin ID</h2>";
-throw new Error("Sin ID");
-}
-
 const urlActual = window.location.href;
 
-/* FUNCIONES */
 function copiar(){
 navigator.clipboard.writeText(urlActual);
 alert("Link copiado");
 }
 
-/* 🔥 WHATSAPP CON DATOS */
-function enviarWhatsApp(titulo, id){
-const mensaje = `Hola, estoy interesado en esta propiedad:\n\n🏡 ${titulo}\n🆔 ID: ${id}\n\n${urlActual}`;
+function enviarWhatsApp(titulo,id){
+const mensaje = `Hola, me interesa esta propiedad:\n🏡 ${titulo}\n🆔 ID: ${id}\n${urlActual}`;
 window.open(`https://wa.me/573016492983?text=${encodeURIComponent(mensaje)}`);
 }
 
-/* PDF */
 async function pdf(){
-
 const element=document.getElementById("ficha");
-
-const imgs = element.querySelectorAll("img");
-
-await Promise.all(Array.from(imgs).map(img=>{
-if(img.complete) return Promise.resolve();
-return new Promise(res=>{
-img.onload=res;
-img.onerror=res;
-});
-}));
-
-html2pdf().set({
-margin:0.3,
-filename:'propiedad.pdf',
-image:{type:'jpeg',quality:1},
-html2canvas:{scale:2,useCORS:true},
-jsPDF:{unit:'in',format:'letter'}
-}).from(element).save();
-
+html2pdf().from(element).save();
 }
 
-/* CARGAR */
 async function cargar(){
 
 const res = await fetch("https://script.google.com/macros/s/AKfycbwWFcQ1nlVsLyiEOFMvSbYAxPHdAqSvKP1qMCvp1BrQkhb6ctod8oSShrj1cBKWzSc/exec?action=read_propiedades");
 const json = await res.json();
 const data = json.data;
 
-const p = data.find(x => String(x.ID || x.id || x.Id) === String(id));
+const p = data.find(x => String(x.ID || x.id) === String(id));
 
-if(!p){
-document.getElementById("contenido").innerHTML="<h2>No disponible</h2>";
-return;
-}
+/* CONTADOR */
+const key = "visitas_"+id;
+let visitas = localStorage.getItem(key) || 0;
+visitas++;
+localStorage.setItem(key, visitas);
 
-function getCampo(o,keys){
-for(let k of keys){
-if(o[k]) return o[k];
-}
-return "";
-}
-
-const titulo = getCampo(p,["TITULO","titulo"]);
-const ciudad = getCampo(p,["CIUDAD","ciudad"]);
-const precioRaw = getCampo(p,["PRECIO","precio"]);
-const descripcion = getCampo(p,["DESCRIPCION","descripcion"]);
-
-const precio = precioRaw
-? new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP'}).format(precioRaw)
-: "Consultar";
-
-/* FOTOS */
 const fotos = [
 p.FOTO1,p.FOTO2,p.FOTO3,p.FOTO4,
 p.FOTO5,p.FOTO6,p.FOTO7,p.FOTO8,
 p.FOTO9,p.FOTO10
-].filter(f=>f && f.startsWith("http"));
-
-if(fotos.length===0){
-fotos.push("https://images.unsplash.com/photo-1560448204-e02f11c3d0e2");
-}
-
-function opt(url){
-if(url.includes("res.cloudinary.com")){
-return url.replace("/upload/","/upload/w_1200,q_auto,f_auto/");
-}
-return url;
-}
+].filter(f=>f);
 
 const thumbs = fotos.map((f,i)=>`
-<img src="${opt(f)}" onclick="ir(${i})">
+<img src="${f}" onclick="ir(${i})">
 `).join("");
 
 document.getElementById("contenido").innerHTML=`
-<div class="slider">
-<img id="img" src="${opt(fotos[0])}">
-</div>
+<img id="img" src="${fotos[0]}">
 
 <div class="miniaturas">${thumbs}</div>
 
-<h1>${titulo}</h1>
-<p>${ciudad}</p>
-<p class="price">${precio}</p>
+<h2>${p.TITULO}</h2>
+<p>${p.CIUDAD}</p>
+<p class="price">$ ${p.PRECIO}</p>
 
-<div class="desc">${descripcion}</div>
+<p>👁 ${visitas} visitas</p>
+
+<p>${p.DESCRIPCION || ''}</p>
 
 <div class="actions">
 <button class="btn copy" onclick="copiar()">Copiar link</button>
-
-<button class="btn whatsapp" onclick="enviarWhatsApp('${titulo}','${id}')">
-WhatsApp
-</button>
-
+<button class="btn whatsapp" onclick="enviarWhatsApp('${p.TITULO}','${id}')">WhatsApp</button>
 <button class="btn pdf" onclick="pdf()">PDF</button>
 </div>
 `;
 
 window.ir=function(i){
-document.getElementById("img").src=opt(fotos[i]);
+document.getElementById("img").src=fotos[i];
 }
 
 }
