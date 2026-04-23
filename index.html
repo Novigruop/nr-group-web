@@ -15,7 +15,7 @@ color:white;
 padding-top:90px;
 }
 
-/* 🔥 NAVBAR PREMIUM */
+/* NAVBAR */
 .navbar{
 position:fixed;
 top:0;
@@ -29,30 +29,22 @@ padding:15px 40px;
 z-index:1000;
 }
 
-.logo{
-font-weight:700;
-font-size:20px;
-letter-spacing:1px;
-}
+.logo{font-weight:700;font-size:20px}
 
 /* MENU */
 .menu{
 list-style:none;
 display:flex;
 gap:25px;
-align-items:center;
 }
 
 .menu a{
 color:#ddd;
 text-decoration:none;
 font-size:14px;
-transition:0.3s;
 }
 
-.menu a:hover{
-color:white;
-}
+.menu a:hover{color:white}
 
 /* CTA */
 .cta{
@@ -60,15 +52,8 @@ background:linear-gradient(135deg,#c9a857,#e5c87a);
 color:black;
 padding:10px 18px;
 border-radius:8px;
-font-size:14px;
 font-weight:bold;
 text-decoration:none;
-transition:0.3s;
-}
-
-.cta:hover{
-transform:translateY(-2px);
-box-shadow:0 5px 15px rgba(201,168,87,0.4);
 }
 
 /* HERO */
@@ -79,10 +64,9 @@ display:flex;
 flex-direction:column;
 align-items:center;
 justify-content:center;
-text-align:center;
 }
 
-/* 🔥 BUSCADOR CENTRADO */
+/* BUSCADOR */
 .buscador{
 background:white;
 padding:15px;
@@ -92,7 +76,6 @@ gap:10px;
 flex-wrap:wrap;
 justify-content:center;
 margin-top:20px;
-box-shadow:0 10px 30px rgba(0,0,0,0.3);
 }
 
 .buscador select,
@@ -110,13 +93,9 @@ border-radius:6px;
 cursor:pointer;
 }
 
-/* SECTION */
-.section{
-padding:40px 20px;
-text-align:center;
-}
-
 /* CARDS */
+.section{padding:40px}
+
 .cards{
 display:flex;
 flex-wrap:wrap;
@@ -129,8 +108,6 @@ background:#111;
 padding:15px;
 border-radius:10px;
 width:300px;
-text-align:left;
-position:relative;
 }
 
 .card img{
@@ -143,10 +120,7 @@ border-radius:10px;
 .price{color:#c9a857}
 
 /* PREMIUM */
-.premium{
-border:2px solid #c9a857;
-}
-
+.premium{border:2px solid #c9a857}
 .badge{
 position:absolute;
 top:10px;
@@ -155,7 +129,6 @@ background:#c9a857;
 color:black;
 padding:5px;
 border-radius:5px;
-font-size:12px;
 }
 
 /* WHATSAPP */
@@ -165,7 +138,6 @@ bottom:20px;
 right:20px;
 background:#25D366;
 color:white;
-font-size:24px;
 width:60px;
 height:60px;
 display:flex;
@@ -175,10 +147,8 @@ border-radius:50%;
 text-decoration:none;
 }
 
-/* MOBILE */
 @media(max-width:768px){
 .menu{display:none}
-.hero h1{font-size:24px}
 .card{width:90%}
 }
 </style>
@@ -186,30 +156,22 @@ text-decoration:none;
 
 <body>
 
-<!-- 🔥 HEADER -->
 <header class="navbar">
+<div class="logo">NR Group</div>
 
-  <div class="logo">NR Group</div>
+<ul class="menu">
+<li><a href="#">Nosotros</a></li>
+<li><a href="#propiedades">Propiedades</a></li>
+<li><a href="#">Servicios</a></li>
+<li><a href="#">Blog</a></li>
+<li><a href="#">Contacto</a></li>
+</ul>
 
-  <nav>
-    <ul class="menu">
-      <li><a href="#">Nosotros</a></li>
-      <li><a href="#propiedades">Propiedades</a></li>
-      <li><a href="#">Servicios</a></li>
-      <li><a href="#">Blog</a></li>
-      <li><a href="#">Contacto</a></li>
-    </ul>
-  </nav>
-
-  <a href="https://wa.me/573016492983?text=Hola%20quiero%20vender%20o%20arrendar%20mi%20propiedad"
-     target="_blank"
-     class="cta">
-     Vende o arrienda con nosotros
-  </a>
-
+<a href="https://wa.me/573016492983?text=Hola%20quiero%20vender%20mi%20propiedad" class="cta">
+Vende o arrienda
+</a>
 </header>
 
-<!-- HERO -->
 <section class="hero">
 
 <h1>Encuentra tu propiedad ideal</h1>
@@ -226,13 +188,14 @@ text-decoration:none;
 <option value="">Categoría</option>
 <option value="APARTAMENTO">Apartamento</option>
 <option value="CASA">Casa</option>
+<option value="CASA CAMPESTRE">Casa Campestre</option>
+<option value="LOTE">Lote</option>
 <option value="LOCAL">Local</option>
 <option value="BODEGA">Bodega</option>
 <option value="OFICINA">Oficina</option>
 </select>
 
 <input type="text" id="ciudad" placeholder="Ciudad">
-
 <input type="number" id="precio" placeholder="Precio máximo">
 
 <button onclick="buscar()">Buscar</button>
@@ -241,12 +204,10 @@ text-decoration:none;
 
 </section>
 
-<!-- PROPIEDADES -->
 <section id="propiedades" class="section">
 <div id="propiedades-container" class="cards"></div>
 </section>
 
-<!-- WHATSAPP -->
 <a href="https://wa.me/573016492983" class="wa-float">💬</a>
 
 <script>
@@ -270,7 +231,6 @@ const precio=p.PRECIO
 ? new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP'}).format(p.PRECIO)
 : "Consultar";
 
-const id=p.ID;
 const destacado=(p.DESTACADO||"")=="SI";
 
 c.innerHTML+=`
@@ -280,13 +240,12 @@ ${destacado?'<div class="badge">⭐ PREMIUM</div>':''}
 <h3>${p.TITULO}</h3>
 <p>${p.CIUDAD}</p>
 <p class="price">${precio}</p>
-<a href="propiedad.html?id=${id}">Ver</a>
+<a href="propiedad.html?id=${p.ID}">Ver</a>
 </div>
 `;
 });
 }
 
-/* BUSQUEDA */
 function buscar(){
 
 const tipo=document.getElementById("tipo").value;
@@ -294,19 +253,19 @@ const categoria=document.getElementById("categoria").value;
 const ciudad=document.getElementById("ciudad").value.toLowerCase();
 const precio=document.getElementById("precio").value;
 
-/* URL */
 const url=new URL(window.location);
+
 if(tipo) url.searchParams.set("tipo",tipo);
 if(categoria) url.searchParams.set("categoria",categoria);
 if(ciudad) url.searchParams.set("ciudad",ciudad);
 if(precio) url.searchParams.set("precio",precio);
+
 window.history.pushState({},'',url);
 
-/* FILTRO */
 const f=data.filter(p=>{
 return(
 (!tipo||p.TIPO==tipo) &&
-(!categoria||p.CATEGORIA?.includes(categoria)) &&
+(!categoria||p.CATEGORIA?.toUpperCase().includes(categoria)) &&
 (!ciudad||p.CIUDAD?.toLowerCase().includes(ciudad)) &&
 (!precio||p.PRECIO<=precio)
 );
@@ -315,7 +274,6 @@ return(
 render(f);
 }
 
-/* LEER URL */
 function leerURL(){
 const params=new URLSearchParams(window.location.search);
 
