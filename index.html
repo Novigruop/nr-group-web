@@ -28,113 +28,53 @@ padding:15px 40px;
 z-index:1000;
 }
 
-.logo{font-weight:bold;font-size:18px}
-
-/* MENU */
-.menu{
-list-style:none;
-display:flex;
-gap:30px;
-align-items:center;
-}
-
-.menu li{
-position:relative;
-}
-
-/* CLICKABLE */
-.menu a{
-color:white;
-text-decoration:none;
-cursor:pointer;
-}
-
-/* DROPDOWN (FIX PRO) */
-.dropdown{
-position:relative;
-padding-bottom:15px; /* 🔥 evita que se cierre */
-}
-
-.submenu{
-position:absolute;
-top:100%;
-left:0;
-background:white;
-color:black;
-list-style:none;
-padding:10px;
-border-radius:12px;
-display:none;
-min-width:180px;
-box-shadow:0 10px 25px rgba(0,0,0,0.3);
-}
-
-.submenu li{
-padding:10px;
-border-radius:6px;
-cursor:pointer;
-}
-
-.submenu li:hover{
-background:#f2f2f2;
-}
-
-/* HOVER SOLIDO */
-.dropdown:hover .submenu{
-display:block;
-}
+.logo{font-weight:bold}
 
 /* HERO */
 .hero{
 height:60vh;
 background:url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c') center/cover;
 display:flex;
+flex-direction:column;
 align-items:center;
 justify-content:center;
 text-align:center;
 }
 
-.hero h1{
-font-size:40px;
-background:rgba(0,0,0,0.6);
-padding:20px;
-border-radius:10px;
+/* 🔥 FILTRO CENTRAL */
+.buscador{
+background:white;
+padding:15px;
+border-radius:12px;
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+justify-content:center;
+margin-top:20px;
+box-shadow:0 10px 30px rgba(0,0,0,0.3);
 }
 
-/* SECTION */
+.buscador select,
+.buscador input{
+padding:10px;
+border-radius:6px;
+border:1px solid #ddd;
+}
+
+.buscador button{
+background:#c9a857;
+border:none;
+padding:10px 15px;
+border-radius:6px;
+cursor:pointer;
+}
+
+/* CARDS */
 .section{
 padding:40px 20px;
 text-align:center;
 }
 
-/* FILTROS */
-.filtros{
-display:flex;
-justify-content:center;
-gap:10px;
-flex-wrap:wrap;
-margin-bottom:30px;
-}
-
-input{
-padding:10px;
-border-radius:6px;
-border:none;
-}
-
-/* BOTON */
-.btn{
-background:#c9a857;
-color:black;
-border:none;
-padding:10px 15px;
-border-radius:6px;
-cursor:pointer;
-text-decoration:none;
-display:inline-block;
-}
-
-/* CARDS */
 .cards{
 display:flex;
 flex-wrap:wrap;
@@ -158,23 +98,22 @@ object-fit:cover;
 border-radius:10px;
 }
 
-.price{color:#c9a857;font-weight:bold}
+.price{color:#c9a857}
 
 /* PREMIUM */
 .premium{
 border:2px solid #c9a857;
-transform:scale(1.03);
 }
 
 .badge{
 position:absolute;
-background:#c9a857;
-color:black;
-padding:5px 10px;
-border-radius:5px;
-font-size:12px;
 top:10px;
 left:10px;
+background:#c9a857;
+color:black;
+padding:5px;
+border-radius:5px;
+font-size:12px;
 }
 
 /* WHATSAPP */
@@ -192,98 +131,70 @@ align-items:center;
 justify-content:center;
 border-radius:50%;
 text-decoration:none;
-z-index:9999;
 }
 
-/* MOBILE */
-@media(max-width:768px){
-.menu{flex-direction:column}
-.card{width:90%}
-.hero h1{font-size:24px}
-}
 </style>
 </head>
 
 <body>
 
-<!-- NAVBAR -->
 <header class="navbar">
   <div class="logo">NR Group</div>
-
-  <ul class="menu">
-    <li><a onclick="resetFiltro()">Inicio</a></li>
-
-    <!-- ARRIENDO -->
-    <li class="dropdown">
-      <a>Arriendo ▾</a>
-      <ul class="submenu">
-        <li onclick="filtrarTipo('ARRIENDO','APARTAMENTO')">Apartamentos</li>
-        <li onclick="filtrarTipo('ARRIENDO','APARTAESTUDIO')">Apartaestudios</li>
-        <li onclick="filtrarTipo('ARRIENDO','BODEGA')">Bodegas</li>
-        <li onclick="filtrarTipo('ARRIENDO','CASA')">Casas</li>
-        <li onclick="filtrarTipo('ARRIENDO','LOCAL')">Locales</li>
-        <li onclick="filtrarTipo('ARRIENDO','OFICINA')">Oficinas</li>
-      </ul>
-    </li>
-
-    <!-- VENTA -->
-    <li class="dropdown">
-      <a>Venta ▾</a>
-      <ul class="submenu">
-        <li onclick="filtrarTipo('VENTA','APARTAMENTO')">Apartamentos</li>
-        <li onclick="filtrarTipo('VENTA','APARTAESTUDIO')">Apartaestudios</li>
-        <li onclick="filtrarTipo('VENTA','BODEGA')">Bodegas</li>
-        <li onclick="filtrarTipo('VENTA','CASA')">Casas</li>
-        <li onclick="filtrarTipo('VENTA','LOCAL')">Locales</li>
-        <li onclick="filtrarTipo('VENTA','OFICINA')">Oficinas</li>
-      </ul>
-    </li>
-
-    <li><a>Servicios</a></li>
-    <li><a>Blog</a></li>
-    <li><a>Contacto</a></li>
-  </ul>
 </header>
 
-<!-- HERO -->
+<!-- HERO + FILTRO -->
 <section class="hero">
-  <h1>Inmobiliaria en Pereira</h1>
-</section>
 
-<!-- PROPIEDADES -->
-<section class="section">
+<h1>Encuentra tu propiedad ideal</h1>
 
-<h2>Propiedades</h2>
+<div class="buscador">
 
-<div class="filtros">
-  <input type="text" id="filtroCiudad" placeholder="Ciudad">
-  <input type="number" id="filtroPrecio" placeholder="Precio máximo">
-  <button onclick="filtrar()" class="btn">Buscar</button>
+<select id="tipo">
+<option value="">Tipo</option>
+<option value="VENTA">Venta</option>
+<option value="ARRIENDO">Arriendo</option>
+</select>
+
+<select id="categoria">
+<option value="">Categoría</option>
+<option value="APARTAMENTO">Apartamento</option>
+<option value="CASA">Casa</option>
+<option value="LOCAL">Local</option>
+<option value="BODEGA">Bodega</option>
+<option value="OFICINA">Oficina</option>
+</select>
+
+<input type="text" id="ciudad" placeholder="Ciudad">
+
+<input type="number" id="precio" placeholder="Precio máximo">
+
+<button onclick="buscar()">Buscar</button>
+
 </div>
 
-<div id="propiedades-container" class="cards"></div>
-
 </section>
 
-<a href="https://wa.me/573016492983" target="_blank" class="wa-float">💬</a>
+<!-- RESULTADOS -->
+<section class="section">
+<div id="propiedades-container" class="cards"></div>
+</section>
+
+<a href="https://wa.me/573016492983" class="wa-float">💬</a>
 
 <script>
 let data=[];
 
+/* CARGAR DATA */
 async function cargar(){
 const res=await fetch("https://script.google.com/macros/s/AKfycbwWFcQ1nlVsLyiEOFMvSbYAxPHdAqSvKP1qMCvp1BrQkhb6ctod8oSShrj1cBKWzSc/exec?action=read_propiedades");
 const json=await res.json();
 data=json.data;
-render(data);
+
+/* 🔥 SI HAY PARAMETROS EN URL */
+leerURL();
 }
 
-function optimizar(url){
-if(url.includes("res.cloudinary.com")){
-return url.replace("/upload/","/upload/w_600,q_auto,f_auto/");
-}
-return url;
-}
-
+/* RENDER */
 function render(lista){
 const c=document.getElementById("propiedades-container");
 c.innerHTML="";
@@ -295,51 +206,64 @@ const precio=p.PRECIO
 ? new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP'}).format(p.PRECIO)
 : "Consultar";
 
-const id = p.ID || p.id || p.Id;
+const id=p.ID;
 
-const destacado = (p.DESTACADO || "").toUpperCase() === "SI";
+const destacado = (p.DESTACADO||"")=="SI";
 
 c.innerHTML+=`
-<div class="card ${destacado ? 'premium' : ''}">
-${destacado ? '<div class="badge">⭐ PREMIUM</div>' : ''}
-<img src="${optimizar(img)}">
+<div class="card ${destacado?'premium':''}">
+${destacado?'<div class="badge">⭐ PREMIUM</div>':''}
+<img src="${img}">
 <h3>${p.TITULO}</h3>
 <p>${p.CIUDAD}</p>
 <p class="price">${precio}</p>
-<a href="propiedad.html?id=${id}" class="btn">Ver propiedad</a>
+<a href="propiedad.html?id=${id}">Ver</a>
 </div>
 `;
 });
 }
 
-/* FILTRO MENU */
-function filtrarTipo(tipo,categoria){
-const f = data.filter(p=>{
-return(
-p.TIPO?.toUpperCase() === tipo &&
-p.CATEGORIA?.toUpperCase().includes(categoria)
-);
-});
-render(f);
-}
+/* 🔥 BUSQUEDA AVANZADA */
+function buscar(){
 
-/* RESET */
-function resetFiltro(){
-render(data);
-}
+const tipo=document.getElementById("tipo").value;
+const categoria=document.getElementById("categoria").value;
+const ciudad=document.getElementById("ciudad").value.toLowerCase();
+const precio=document.getElementById("precio").value;
 
-/* FILTROS MANUALES */
-function filtrar(){
-const ciudad=document.getElementById("filtroCiudad").value.toLowerCase();
-const precio=document.getElementById("filtroPrecio").value;
+/* URL DINAMICA */
+const url = new URL(window.location);
 
+if(tipo) url.searchParams.set("tipo",tipo);
+if(categoria) url.searchParams.set("categoria",categoria);
+if(ciudad) url.searchParams.set("ciudad",ciudad);
+if(precio) url.searchParams.set("precio",precio);
+
+window.history.pushState({},'',url);
+
+/* FILTRAR */
 const f=data.filter(p=>{
 return(
+(!tipo||p.TIPO==tipo) &&
+(!categoria||p.CATEGORIA?.includes(categoria)) &&
 (!ciudad||p.CIUDAD?.toLowerCase().includes(ciudad)) &&
 (!precio||p.PRECIO<=precio)
 );
 });
+
 render(f);
+}
+
+/* 🔥 LEER URL */
+function leerURL(){
+const params=new URLSearchParams(window.location.search);
+
+document.getElementById("tipo").value=params.get("tipo")||"";
+document.getElementById("categoria").value=params.get("categoria")||"";
+document.getElementById("ciudad").value=params.get("ciudad")||"";
+document.getElementById("precio").value=params.get("precio")||"";
+
+buscar();
 }
 
 cargar();
