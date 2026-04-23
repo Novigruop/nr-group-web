@@ -2,130 +2,57 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Proyectos Inmobiliarios</title>
+<title>Proyectos</title>
 
 <style>
-body{
-font-family:Arial;
-background:#0b0b0b;
-color:white;
-margin:0;
-}
-
-/* HEADER */
-.header{
-background:#111;
-padding:15px 30px;
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
-
-.header a{
-color:white;
-text-decoration:none;
-}
-
-/* TITULO */
-.titulo{
-text-align:center;
-padding:40px 20px;
-}
-
-/* CARDS */
-.cards{
-display:flex;
-flex-wrap:wrap;
-justify-content:center;
-gap:20px;
-padding:20px;
-}
-
-.card{
-background:#111;
-width:300px;
-border-radius:10px;
-overflow:hidden;
-}
-
-.card img{
-width:100%;
-height:200px;
-object-fit:cover;
-}
-
-.card-content{
-padding:15px;
-}
-
-.btn{
-background:#c9a857;
-padding:10px;
-display:inline-block;
-border-radius:6px;
-text-decoration:none;
-color:black;
-margin-top:10px;
-}
-
-/* WHATSAPP */
-.wa{
-position:fixed;
-bottom:20px;
-right:20px;
-background:#25D366;
-color:white;
-width:60px;
-height:60px;
-display:flex;
-align-items:center;
-justify-content:center;
-border-radius:50%;
-text-decoration:none;
-}
+body{font-family:Arial;background:#0b0b0b;color:white;margin:0}
+.cards{display:flex;flex-wrap:wrap;gap:20px;justify-content:center;padding:20px}
+.card{background:#111;width:300px;border-radius:10px;overflow:hidden}
+.card img{width:100%;height:200px;object-fit:cover}
+.card-content{padding:15px}
+.btn{background:#c9a857;padding:10px;border-radius:6px;text-decoration:none;color:black}
 </style>
 </head>
 
 <body>
 
-<div class="header">
-<a href="index.html">← Inicio</a>
-<h3>NR Group</h3>
-</div>
+<h1 style="text-align:center;margin-top:20px">Proyectos</h1>
 
-<div class="titulo">
-<h1>Proyectos Inmobiliarios</h1>
-<p>Invierte en proyectos de alta valorización</p>
-</div>
+<div id="cards" class="cards"></div>
 
-<div class="cards">
+<script>
 
-<!-- PROYECTO 1 -->
+const URL = "PEGA_AQUI_TU_SCRIPT";
+
+async function cargar(){
+
+const res = await fetch(URL);
+const json = await res.json();
+const data = json.data;
+
+const c = document.getElementById("cards");
+
+data.forEach(p=>{
+
+c.innerHTML += `
 <div class="card">
-<img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c">
+<img src="${p.IMAGEN}">
 <div class="card-content">
-<h3>Reserva del Lago</h3>
-<p>Pereira</p>
-<p>Desde $220.000.000</p>
-<a href="proyecto.html?id=1" class="btn">Ver proyecto</a>
+<h3>${p.TITULO}</h3>
+<p>${p.CIUDAD}</p>
+<p>${p.PRECIO}</p>
+<a href="proyecto.html?id=${p.ID}" class="btn">Ver</a>
 </div>
 </div>
+`;
 
-<!-- PROYECTO 2 -->
-<div class="card">
-<img src="https://images.unsplash.com/photo-1560448204-e02f11c3d0e2">
-<div class="card-content">
-<h3>Altos de Combia</h3>
-<p>Combia</p>
-<p>Desde $150.000.000</p>
-<a href="proyecto.html?id=2" class="btn">Ver proyecto</a>
-</div>
-</div>
+});
 
-</div>
+}
 
-<a href="https://wa.me/573016492983" class="wa">💬</a>
+cargar();
+
+</script>
 
 </body>
 </html>
