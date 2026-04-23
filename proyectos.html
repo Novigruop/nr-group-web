@@ -2,27 +2,81 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Proyectos</title>
 
 <style>
-body{font-family:Arial;background:#0b0b0b;color:white;margin:0}
-.cards{display:flex;flex-wrap:wrap;gap:20px;justify-content:center;padding:20px}
-.card{background:#111;width:300px;border-radius:10px;overflow:hidden}
-.card img{width:100%;height:200px;object-fit:cover}
-.card-content{padding:15px}
-.btn{background:#c9a857;padding:10px;border-radius:6px;text-decoration:none;color:black}
+body{
+font-family:Arial;
+background:#0b0b0b;
+color:white;
+margin:0;
+}
+
+h1{
+text-align:center;
+margin:30px 0;
+}
+
+/* GRID */
+.cards{
+display:flex;
+flex-wrap:wrap;
+gap:20px;
+justify-content:center;
+padding:20px;
+}
+
+/* CARD */
+.card{
+background:#111;
+width:300px;
+border-radius:12px;
+overflow:hidden;
+transition:0.3s;
+cursor:pointer;
+}
+
+.card:hover{
+transform:scale(1.03);
+}
+
+.card img{
+width:100%;
+height:200px;
+object-fit:cover;
+}
+
+.content{
+padding:15px;
+}
+
+.price{
+color:#c9a857;
+font-weight:bold;
+}
+
+.btn{
+background:#c9a857;
+color:black;
+padding:10px;
+display:inline-block;
+margin-top:10px;
+border-radius:6px;
+text-decoration:none;
+}
 </style>
 </head>
 
 <body>
 
-<h1 style="text-align:center;margin-top:20px">Proyectos</h1>
+<h1>Proyectos Inmobiliarios</h1>
 
 <div id="cards" class="cards"></div>
 
 <script>
 
-const URL = "PEGA_AQUI_TU_SCRIPT";
+const URL = "https://script.google.com/macros/s/AKfycbwWFcQ1nlVsLyiEOFMvSbYAxPHdAqSvKP1qMCvp1BrQkhb6ctod8oSShrj1cBKWzSc/exec?action=read_proyectos";
 
 async function cargar(){
 
@@ -30,24 +84,30 @@ const res = await fetch(URL);
 const json = await res.json();
 const data = json.data;
 
-const c = document.getElementById("cards");
+const cont = document.getElementById("cards");
 
 data.forEach(p=>{
 
-c.innerHTML += `
-<div class="card">
-<img src="${p.IMAGEN}">
-<div class="card-content">
+let imagen = p.IMAGEN || "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2";
+
+cont.innerHTML += `
+<div class="card" onclick="verProyecto(${p.ID})">
+<img src="${imagen}">
+<div class="content">
 <h3>${p.TITULO}</h3>
 <p>${p.CIUDAD}</p>
-<p>${p.PRECIO}</p>
-<a href="proyecto.html?id=${p.ID}" class="btn">Ver</a>
+<p class="price">${p.PRECIO}</p>
+<a class="btn">Ver proyecto</a>
 </div>
 </div>
 `;
 
 });
 
+}
+
+function verProyecto(id){
+window.location.href = "proyecto.html?id=" + id;
 }
 
 cargar();
