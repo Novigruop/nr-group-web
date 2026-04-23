@@ -38,13 +38,36 @@ padding:20px;
 border-radius:10px;
 }
 
-/* 🔥 IMAGEN PRINCIPAL */
-.main-img{
+/* 🔥 SLIDER */
+.slider{
+position:relative;
+overflow:hidden;
+border-radius:10px;
+}
+
+.slider img{
 width:100%;
 height:350px;
 object-fit:cover;
-border-radius:10px;
+transition:0.3s;
 }
+
+/* FLECHAS */
+.arrow{
+position:absolute;
+top:50%;
+transform:translateY(-50%);
+background:rgba(0,0,0,0.6);
+color:white;
+border:none;
+padding:10px;
+border-radius:50%;
+cursor:pointer;
+font-size:18px;
+}
+
+.left{left:10px}
+.right{right:10px}
 
 /* MINI */
 .miniaturas{
@@ -63,9 +86,7 @@ cursor:pointer;
 opacity:.7;
 }
 
-.miniaturas img:hover{
-opacity:1;
-}
+.miniaturas img:hover{opacity:1}
 
 /* TEXTO */
 .price{
@@ -93,7 +114,7 @@ cursor:pointer;
 .whatsapp{background:#25D366;color:white}
 .pdf{background:#c9a857;color:black}
 
-/* WHATSAPP FLOAT */
+/* FLOAT */
 .wa-float{
 position:fixed;
 bottom:20px;
@@ -107,14 +128,11 @@ display:flex;
 align-items:center;
 justify-content:center;
 border-radius:50%;
-text-decoration:none;
 }
 
-/* 📱 MOBILE */
+/* MOBILE */
 @media(max-width:768px){
-.main-img{
-height:220px;
-}
+.slider img{height:220px}
 }
 </style>
 </head>
@@ -163,7 +181,6 @@ const data = json.data;
 
 const p = data.find(x => String(x.ID || x.id) === String(id));
 
-/* CONTADOR */
 const key = "visitas_"+id;
 let visitas = localStorage.getItem(key) || 0;
 visitas++;
@@ -175,9 +192,38 @@ p.FOTO5,p.FOTO6,p.FOTO7,p.FOTO8,
 p.FOTO9,p.FOTO10
 ].filter(f=>f);
 
-/* FALLBACK */
-if(fotos.length === 0){
+if(fotos.length===0){
 fotos.push("https://images.unsplash.com/photo-1560448204-e02f11c3d0e2");
+}
+
+let index=0;
+
+/* SLIDER FUNCIONES */
+function mostrar(){
+document.getElementById("img").src = fotos[index];
+}
+
+function next(){
+index=(index+1)%fotos.length;
+mostrar();
+}
+
+function prev(){
+index=(index-1+fotos.length)%fotos.length;
+mostrar();
+}
+
+/* SWIPE */
+let startX=0;
+
+function touchStart(e){
+startX=e.touches[0].clientX;
+}
+
+function touchEnd(e){
+let endX=e.changedTouches[0].clientX;
+if(startX-endX>50) next();
+if(endX-startX>50) prev();
 }
 
 const thumbs = fotos.map((f,i)=>`
@@ -186,7 +232,11 @@ const thumbs = fotos.map((f,i)=>`
 
 document.getElementById("contenido").innerHTML=`
 
-<img id="img" class="main-img" src="${fotos[0]}">
+<div class="slider" ontouchstart="touchStart(event)" ontouchend="touchEnd(event)">
+<button class="arrow left" onclick="prev()">←</button>
+<img id="img" src="${fotos[0]}">
+<button class="arrow right" onclick="next()">→</button>
+</div>
 
 <div class="miniaturas">${thumbs}</div>
 
@@ -206,7 +256,8 @@ document.getElementById("contenido").innerHTML=`
 `;
 
 window.ir=function(i){
-document.getElementById("img").src=fotos[i];
+index=i;
+mostrar();
 }
 
 }
