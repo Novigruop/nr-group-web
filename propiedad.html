@@ -5,19 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ficha propiedad</title>
 
+<!-- PDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
 body{font-family:Arial;background:white;color:#111;margin:0}
 
-/* CONTENEDOR */
 .container{
 max-width:900px;
 margin:auto;
 padding:20px;
 }
 
-/* SLIDER */
 .slider img{
 width:100%;
 height:400px;
@@ -25,7 +24,6 @@ object-fit:cover;
 border-radius:10px;
 }
 
-/* MINI */
 .miniaturas{
 display:flex;
 gap:8px;
@@ -42,27 +40,37 @@ cursor:pointer;
 opacity:.7;
 }
 
-.miniaturas img:hover{opacity:1}
-
 .price{
 font-size:22px;
 margin:10px 0;
 font-weight:bold;
 }
 
-.desc{
-margin-top:10px;
-line-height:1.5;
+.desc{margin-top:10px}
+
+/* BOTONES */
+.actions{
+margin-top:20px;
+display:flex;
+flex-wrap:wrap;
+gap:10px;
 }
 
-.pdf-btn{
-margin-top:20px;
-padding:12px 20px;
-background:black;
-color:white;
+.btn{
+padding:10px 15px;
 border:none;
 border-radius:6px;
 cursor:pointer;
+}
+
+.copy{background:#333;color:white}
+.whatsapp{background:#25D366;color:white}
+.pdf{background:black;color:white}
+
+/* QR */
+.qr{
+margin-top:20px;
+text-align:center;
 }
 </style>
 </head>
@@ -78,18 +86,45 @@ cursor:pointer;
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 
-if(!id){
-document.getElementById("contenido").innerHTML="<h2>Propiedad no encontrada</h2>";
+const urlActual = window.location.href;
+
+/* COPIAR */
+function copiar(){
+navigator.clipboard.writeText(urlActual);
+alert("Link copiado");
 }
 
-/* CARGAR */
+/* WHATSAPP */
+function compartir(){
+const texto = "Mira esta propiedad: " + urlActual;
+window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`);
+}
+
+/* QR */
+function generarQR(){
+const qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(urlActual);
+return `<img src="${qrUrl}">`;
+}
+
+/* PDF */
+function pdf(){
+const element=document.getElementById("ficha");
+
+html2pdf().set({
+margin:0.5,
+filename:'propiedad.pdf',
+html2canvas:{scale:2},
+jsPDF:{unit:'in',format:'letter'}
+}).from(element).save();
+}
+
+/* CARGAR DATA */
 async function cargar(){
 
 const res = await fetch("https://script.google.com/macros/s/AKfycbwWFcQ1nlVsLyiEOFMvSbYAxPHdAqSvKP1qMCvp1BrQkhb6ctod8oSShrj1cBKWzSc/exec?action=read_propiedades");
 const json = await res.json();
 const data = json.data;
 
-/* BUSCAR */
 const p = data.find(x => String(x.ID || x.id || x.Id) === String(id));
 
 if(!p){
@@ -97,7 +132,6 @@ document.getElementById("contenido").innerHTML="<h2>No disponible</h2>";
 return;
 }
 
-/* CAMPOS */
 function getCampo(o,keys){
 for(let k of keys){
 if(o[k]) return o[k];
@@ -105,7 +139,7 @@ if(o[k]) return o[k];
 return "";
 }
 
-const titulo = getCampo(p,["TITULO","titulo","nombre"]);
+const titulo = getCampo(p,["TITULO","titulo"]);
 const ciudad = getCampo(p,["CIUDAD","ciudad"]);
 const precioRaw = getCampo(p,["PRECIO","precio"]);
 const descripcion = getCampo(p,["DESCRIPCION","descripcion"]);
@@ -114,7 +148,6 @@ const precio = precioRaw
 ? new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP'}).format(precioRaw)
 : "Consultar";
 
-/* FOTOS */
 const fotos = [
 p.FOTO1,p.FOTO2,p.FOTO3,p.FOTO4,
 p.FOTO5,p.FOTO6,p.FOTO7,p.FOTO8,
@@ -125,7 +158,6 @@ if(fotos.length===0){
 fotos.push("https://images.unsplash.com/photo-1560448204-e02f11c3d0e2");
 }
 
-/* OPTIMIZAR */
 function opt(url){
 if(url.includes("res.cloudinary.com")){
 return url.replace("/upload/","/upload/w_1200,q_auto,f_auto/");
@@ -133,12 +165,10 @@ return url.replace("/upload/","/upload/w_1200,q_auto,f_auto/");
 return url;
 }
 
-/* MINI */
 const thumbs = fotos.map((f,i)=>`
 <img src="${opt(f)}" onclick="ir(${i})">
 `).join("");
 
-/* RENDER */
 document.getElementById("contenido").innerHTML=`
 <div class="slider">
 <img id="img" src="${opt(fotos[0])}">
@@ -152,10 +182,17 @@ document.getElementById("contenido").innerHTML=`
 
 <div class="desc">${descripcion}</div>
 
-<button class="pdf-btn" onclick="pdf()">📄 Descargar PDF</button>
+<div class="actions">
+<button class="btn copy" onclick="copiar()">Copiar link</button>
+<button class="btn whatsapp" onclick="compartir()">WhatsApp</button>
+<button class="btn pdf" onclick="pdf()">PDF</button>
+</div>
+
+<div class="qr">
+${generarQR()}
+</div>
 `;
 
-/* CAMBIAR IMG */
 window.ir=function(i){
 document.getElementById("img").src=opt(fotos[i]);
 }
@@ -163,18 +200,6 @@ document.getElementById("img").src=opt(fotos[i]);
 }
 
 cargar();
-
-/* PDF */
-function pdf(){
-const element=document.getElementById("ficha");
-
-html2pdf().set({
-margin:0.5,
-filename:'propiedad.pdf',
-html2canvas:{scale:2},
-jsPDF:{unit:'in',format:'letter'}
-}).from(element).save();
-}
 
 </script>
 
