@@ -57,6 +57,7 @@ border-radius:6px;
 border:none;
 }
 
+/* BOTON */
 .btn{
 background:#c9a857;
 color:black;
@@ -82,6 +83,7 @@ padding:15px;
 border-radius:10px;
 width:300px;
 text-align:left;
+position:relative;
 }
 
 .card img{
@@ -92,6 +94,42 @@ border-radius:10px;
 }
 
 .price{color:#c9a857;font-weight:bold}
+
+/* PREMIUM */
+.premium{
+border:2px solid #c9a857;
+transform:scale(1.03);
+}
+
+.badge{
+position:absolute;
+background:#c9a857;
+color:black;
+padding:5px 10px;
+border-radius:5px;
+font-size:12px;
+top:10px;
+left:10px;
+}
+
+/* WHATSAPP */
+.wa-float{
+position:fixed;
+bottom:20px;
+right:20px;
+background:#25D366;
+color:white;
+font-size:24px;
+width:60px;
+height:60px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:50%;
+text-decoration:none;
+box-shadow:0 5px 15px rgba(0,0,0,0.3);
+z-index:9999;
+}
 
 @media(max-width:768px){
 .card{width:90%}
@@ -126,6 +164,9 @@ border-radius:10px;
 
 </section>
 
+<!-- BOTON WHATSAPP -->
+<a href="https://wa.me/573016492983" target="_blank" class="wa-float">💬</a>
+
 <script>
 let data=[];
 
@@ -156,9 +197,15 @@ const precio=p.PRECIO
 
 const id = p.ID || p.id || p.Id;
 
+const destacado = (p.DESTACADO || "").toUpperCase() === "SI";
+
 c.innerHTML+=`
-<div class="card">
+<div class="card ${destacado ? 'premium' : ''}">
+
+${destacado ? '<div class="badge">⭐ PREMIUM</div>' : ''}
+
 <img src="${optimizar(img)}">
+
 <h3>${p.TITULO}</h3>
 <p>${p.CIUDAD}</p>
 <p class="price">${precio}</p>
