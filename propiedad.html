@@ -38,7 +38,7 @@ padding:20px;
 border-radius:10px;
 }
 
-/* 🔥 SLIDER */
+/* SLIDER */
 .slider{
 position:relative;
 overflow:hidden;
@@ -49,7 +49,6 @@ border-radius:10px;
 width:100%;
 height:350px;
 object-fit:cover;
-transition:0.3s;
 }
 
 /* FLECHAS */
@@ -64,6 +63,7 @@ padding:10px;
 border-radius:50%;
 cursor:pointer;
 font-size:18px;
+z-index:10;
 }
 
 .left{left:10px}
@@ -158,21 +158,61 @@ const id = params.get("id");
 
 const urlActual = window.location.href;
 
-function copiar(){
+/* FUNCIONES GLOBALES */
+window.copiar = function(){
 navigator.clipboard.writeText(urlActual);
 alert("Link copiado");
 }
 
-function enviarWhatsApp(titulo,id){
+window.enviarWhatsApp = function(titulo,id){
 const mensaje = `Hola, me interesa:\n${titulo}\nID: ${id}\n${urlActual}`;
 window.open(`https://wa.me/573016492983?text=${encodeURIComponent(mensaje)}`);
 }
 
-function pdf(){
+window.pdf = function(){
 const element=document.getElementById("ficha");
 html2pdf().from(element).save();
 }
 
+/* VARIABLES SLIDER */
+let fotos = [];
+let index = 0;
+
+/* FUNCIONES SLIDER */
+window.next = function(){
+index = (index + 1) % fotos.length;
+document.getElementById("img").src = fotos[index];
+}
+
+window.prev = function(){
+index = (index - 1 + fotos.length) % fotos.length;
+document.getElementById("img").src = fotos[index];
+}
+
+window.ir = function(i){
+index = i;
+document.getElementById("img").src = fotos[index];
+}
+
+/* SWIPE */
+let startX = 0;
+
+function touchStart(e){
+startX = e.touches[0].clientX;
+}
+
+function touchEnd(e){
+let endX = e.changedTouches[0].clientX;
+
+if(startX - endX > 50){
+next();
+}
+if(endX - startX > 50){
+prev();
+}
+}
+
+/* CARGAR */
 async function cargar(){
 
 const res = await fetch("https://script.google.com/macros/s/AKfycbwWFcQ1nlVsLyiEOFMvSbYAxPHdAqSvKP1qMCvp1BrQkhb6ctod8oSShrj1cBKWzSc/exec?action=read_propiedades");
@@ -181,58 +221,32 @@ const data = json.data;
 
 const p = data.find(x => String(x.ID || x.id) === String(id));
 
+/* CONTADOR */
 const key = "visitas_"+id;
 let visitas = localStorage.getItem(key) || 0;
 visitas++;
 localStorage.setItem(key, visitas);
 
-const fotos = [
+/* FOTOS */
+fotos = [
 p.FOTO1,p.FOTO2,p.FOTO3,p.FOTO4,
 p.FOTO5,p.FOTO6,p.FOTO7,p.FOTO8,
 p.FOTO9,p.FOTO10
 ].filter(f=>f);
 
-if(fotos.length===0){
-fotos.push("https://images.unsplash.com/photo-1560448204-e02f11c3d0e2");
+if(fotos.length === 0){
+fotos = ["https://images.unsplash.com/photo-1560448204-e02f11c3d0e2"];
 }
 
-let index=0;
-
-/* SLIDER FUNCIONES */
-function mostrar(){
-document.getElementById("img").src = fotos[index];
-}
-
-function next(){
-index=(index+1)%fotos.length;
-mostrar();
-}
-
-function prev(){
-index=(index-1+fotos.length)%fotos.length;
-mostrar();
-}
-
-/* SWIPE */
-let startX=0;
-
-function touchStart(e){
-startX=e.touches[0].clientX;
-}
-
-function touchEnd(e){
-let endX=e.changedTouches[0].clientX;
-if(startX-endX>50) next();
-if(endX-startX>50) prev();
-}
-
+/* MINI */
 const thumbs = fotos.map((f,i)=>`
 <img src="${f}" onclick="ir(${i})">
 `).join("");
 
-document.getElementById("contenido").innerHTML=`
+/* RENDER */
+document.getElementById("contenido").innerHTML = `
 
-<div class="slider" ontouchstart="touchStart(event)" ontouchend="touchEnd(event)">
+<div class="slider" id="slider">
 <button class="arrow left" onclick="prev()">←</button>
 <img id="img" src="${fotos[0]}">
 <button class="arrow right" onclick="next()">→</button>
@@ -255,10 +269,11 @@ document.getElementById("contenido").innerHTML=`
 </div>
 `;
 
-window.ir=function(i){
-index=i;
-mostrar();
-}
+/* ACTIVAR SWIPE */
+const slider = document.getElementById("slider");
+
+slider.addEventListener("touchstart", touchStart);
+slider.addEventListener("touchend", touchEnd);
 
 }
 
