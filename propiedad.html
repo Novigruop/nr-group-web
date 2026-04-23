@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ficha propiedad</title>
 
-<!-- PDF -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
@@ -48,12 +47,11 @@ font-weight:bold;
 
 .desc{margin-top:10px}
 
-/* BOTONES */
 .actions{
 margin-top:20px;
 display:flex;
-flex-wrap:wrap;
 gap:10px;
+flex-wrap:wrap;
 }
 
 .btn{
@@ -67,11 +65,7 @@ cursor:pointer;
 .whatsapp{background:#25D366;color:white}
 .pdf{background:black;color:white}
 
-/* QR */
-.qr{
-margin-top:20px;
-text-align:center;
-}
+.qr{text-align:center;margin-top:20px}
 </style>
 </head>
 
@@ -83,30 +77,39 @@ text-align:center;
 
 <script>
 
+/* 🔥 LEER ID */
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 
+/* 👉 SI NO HAY ID */
+if(!id){
+document.getElementById("contenido").innerHTML = `
+<h2>⚠️ Debes abrir la propiedad desde el listado</h2>
+<p>Ejemplo correcto:</p>
+<p><b>propiedad.html?id=1</b></p>
+<br>
+<a href="index.html">← Volver</a>
+`;
+throw new Error("No hay ID");
+}
+
 const urlActual = window.location.href;
 
-/* COPIAR */
+/* FUNCIONES EXTRA */
 function copiar(){
 navigator.clipboard.writeText(urlActual);
 alert("Link copiado");
 }
 
-/* WHATSAPP */
 function compartir(){
 const texto = "Mira esta propiedad: " + urlActual;
 window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`);
 }
 
-/* QR */
 function generarQR(){
-const qrUrl = "https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=" + encodeURIComponent(urlActual);
-return `<img src="${qrUrl}">`;
+return `<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(urlActual)}">`;
 }
 
-/* PDF */
 function pdf(){
 const element=document.getElementById("ficha");
 
@@ -125,13 +128,23 @@ const res = await fetch("https://script.google.com/macros/s/AKfycbwWFcQ1nlVsLyiE
 const json = await res.json();
 const data = json.data;
 
+/* 🔍 DEBUG */
+console.log("Buscando ID:", id);
+console.log("Data:", data);
+
+/* BUSCAR */
 const p = data.find(x => String(x.ID || x.id || x.Id) === String(id));
 
 if(!p){
-document.getElementById("contenido").innerHTML="<h2>No disponible</h2>";
+document.getElementById("contenido").innerHTML = `
+<h2>❌ Propiedad no encontrada</h2>
+<p>Verifica el ID en tu Google Sheets</p>
+<p>ID buscado: <b>${id}</b></p>
+`;
 return;
 }
 
+/* NORMALIZAR */
 function getCampo(o,keys){
 for(let k of keys){
 if(o[k]) return o[k];
@@ -148,6 +161,7 @@ const precio = precioRaw
 ? new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP'}).format(precioRaw)
 : "Consultar";
 
+/* FOTOS */
 const fotos = [
 p.FOTO1,p.FOTO2,p.FOTO3,p.FOTO4,
 p.FOTO5,p.FOTO6,p.FOTO7,p.FOTO8,
@@ -169,6 +183,7 @@ const thumbs = fotos.map((f,i)=>`
 <img src="${opt(f)}" onclick="ir(${i})">
 `).join("");
 
+/* RENDER */
 document.getElementById("contenido").innerHTML=`
 <div class="slider">
 <img id="img" src="${opt(fotos[0])}">
