@@ -64,8 +64,6 @@ cursor:pointer;
 .copy{background:#333;color:white}
 .whatsapp{background:#25D366;color:white}
 .pdf{background:black;color:white}
-
-.qr{text-align:center;margin-top:20px}
 </style>
 </head>
 
@@ -77,25 +75,18 @@ cursor:pointer;
 
 <script>
 
-/* 🔥 LEER ID */
+/* ID */
 const params = new URLSearchParams(window.location.search);
 const id = params.get("id");
 
-/* 👉 SI NO HAY ID */
 if(!id){
-document.getElementById("contenido").innerHTML = `
-<h2>⚠️ Debes abrir la propiedad desde el listado</h2>
-<p>Ejemplo correcto:</p>
-<p><b>propiedad.html?id=1</b></p>
-<br>
-<a href="index.html">← Volver</a>
-`;
-throw new Error("No hay ID");
+document.getElementById("contenido").innerHTML="<h2>Error: sin ID</h2>";
+throw new Error("Sin ID");
 }
 
 const urlActual = window.location.href;
 
-/* FUNCIONES EXTRA */
+/* FUNCIONES */
 function copiar(){
 navigator.clipboard.writeText(urlActual);
 alert("Link copiado");
@@ -106,45 +97,49 @@ const texto = "Mira esta propiedad: " + urlActual;
 window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`);
 }
 
-function generarQR(){
-return `<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(urlActual)}">`;
-}
+/* 🔥 PDF CORREGIDO */
+async function pdf(){
 
-function pdf(){
 const element=document.getElementById("ficha");
 
+/* esperar imágenes */
+const imgs = element.querySelectorAll("img");
+
+await Promise.all(Array.from(imgs).map(img=>{
+if(img.complete) return Promise.resolve();
+return new Promise(res=>{
+img.onload=res;
+img.onerror=res;
+});
+}));
+
 html2pdf().set({
-margin:0.5,
+margin:0.3,
 filename:'propiedad.pdf',
-html2canvas:{scale:2},
+image:{type:'jpeg',quality:1},
+html2canvas:{
+scale:2,
+useCORS:true
+},
 jsPDF:{unit:'in',format:'letter'}
 }).from(element).save();
+
 }
 
-/* CARGAR DATA */
+/* CARGAR */
 async function cargar(){
 
 const res = await fetch("https://script.google.com/macros/s/AKfycbwWFcQ1nlVsLyiEOFMvSbYAxPHdAqSvKP1qMCvp1BrQkhb6ctod8oSShrj1cBKWzSc/exec?action=read_propiedades");
 const json = await res.json();
 const data = json.data;
 
-/* 🔍 DEBUG */
-console.log("Buscando ID:", id);
-console.log("Data:", data);
-
-/* BUSCAR */
 const p = data.find(x => String(x.ID || x.id || x.Id) === String(id));
 
 if(!p){
-document.getElementById("contenido").innerHTML = `
-<h2>❌ Propiedad no encontrada</h2>
-<p>Verifica el ID en tu Google Sheets</p>
-<p>ID buscado: <b>${id}</b></p>
-`;
+document.getElementById("contenido").innerHTML="<h2>No disponible</h2>";
 return;
 }
 
-/* NORMALIZAR */
 function getCampo(o,keys){
 for(let k of keys){
 if(o[k]) return o[k];
@@ -183,10 +178,9 @@ const thumbs = fotos.map((f,i)=>`
 <img src="${opt(f)}" onclick="ir(${i})">
 `).join("");
 
-/* RENDER */
 document.getElementById("contenido").innerHTML=`
 <div class="slider">
-<img id="img" src="${opt(fotos[0])}">
+<img id="img" src="${opt(fotos[0])}" crossorigin="anonymous">
 </div>
 
 <div class="miniaturas">${thumbs}</div>
@@ -201,10 +195,6 @@ document.getElementById("contenido").innerHTML=`
 <button class="btn copy" onclick="copiar()">Copiar link</button>
 <button class="btn whatsapp" onclick="compartir()">WhatsApp</button>
 <button class="btn pdf" onclick="pdf()">PDF</button>
-</div>
-
-<div class="qr">
-${generarQR()}
 </div>
 `;
 
