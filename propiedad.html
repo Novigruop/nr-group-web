@@ -27,18 +27,13 @@ background:rgba(0,0,0,0.85);
 z-index:1000;
 }
 
-.header nav{
-display:flex;
-gap:15px;
-}
-
 .header a{
 color:white;
 text-decoration:none;
-font-size:14px;
+margin-left:10px;
 }
 
-/* CONTENEDOR */
+/* CONTENIDO */
 .container{
 max-width:900px;
 margin:90px auto;
@@ -46,32 +41,12 @@ padding:20px;
 }
 
 /* SLIDER */
-.slider{
-position:relative;
-}
-
 .slider img{
 width:100%;
 height:350px;
 object-fit:cover;
 border-radius:10px;
 }
-
-/* FLECHAS */
-.flecha{
-position:absolute;
-top:50%;
-transform:translateY(-50%);
-background:rgba(0,0,0,0.5);
-color:white;
-border:none;
-padding:10px;
-border-radius:50%;
-cursor:pointer;
-}
-
-.izq{left:10px}
-.der{right:10px}
 
 /* MINIATURAS */
 .miniaturas{
@@ -92,11 +67,6 @@ opacity:.7;
 
 .miniaturas img:hover{opacity:1}
 
-/* INFO */
-.info{
-margin-top:20px;
-}
-
 .price{
 color:#c9a857;
 font-size:24px;
@@ -112,12 +82,6 @@ border-radius:6px;
 margin-top:20px;
 text-decoration:none;
 }
-
-/* MOBILE */
-@media(max-width:768px){
-.slider img{height:250px}
-.container{padding:15px}
-}
 </style>
 </head>
 
@@ -125,10 +89,9 @@ text-decoration:none;
 
 <div class="header">
   <div><b>NR Group</b></div>
-  <nav>
+  <div>
     <a href="index.html">Inicio</a>
-    <a href="index.html#propiedades">Propiedades</a>
-  </nav>
+  </div>
 </div>
 
 <div class="container">
@@ -136,36 +99,49 @@ text-decoration:none;
 </div>
 
 <script>
-let p = null;
 
-try{
-  p = JSON.parse(localStorage.getItem("propiedad"));
-}catch(e){}
+/* TRAER DATA */
+let p = JSON.parse(localStorage.getItem("propiedad"));
 
-/* SI NO HAY DATOS */
 if(!p){
 document.getElementById("contenido").innerHTML=`
-<h2>⚠️ No se pudo cargar la propiedad</h2>
-<p>Ingresa desde el listado</p>
-<br>
+<h2>No se pudo cargar la propiedad</h2>
 <a href="index.html" class="btn">Volver</a>
 `;
 throw new Error("Sin datos");
 }
 
-/* FOTOS SEGURAS */
+/* 🔥 NORMALIZAR CAMPOS */
+function getCampo(obj, keys){
+for(let k of keys){
+if(obj[k] !== undefined && obj[k] !== ""){
+return obj[k];
+}
+}
+return "";
+}
+
+/* CAMPOS FLEXIBLES */
+const titulo = getCampo(p, ["TITULO","titulo","nombre","NOMBRE"]);
+const ciudad = getCampo(p, ["CIUDAD","ciudad"]);
+const precioRaw = getCampo(p, ["PRECIO","precio"]);
+const descripcion = getCampo(p, ["DESCRIPCION","descripcion"]);
+
+/* PRECIO */
+const precio = precioRaw
+? new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP'}).format(precioRaw)
+: "Consultar";
+
+/* FOTOS */
 const fotos = [
 p.FOTO1,p.FOTO2,p.FOTO3,p.FOTO4,
 p.FOTO5,p.FOTO6,p.FOTO7,p.FOTO8,
 p.FOTO9,p.FOTO10
-].filter(f => f && f.startsWith("http"));
+].filter(f=>f && f.startsWith("http"));
 
-/* SI NO HAY FOTOS */
-if(fotos.length === 0){
+if(fotos.length===0){
 fotos.push("https://images.unsplash.com/photo-1560448204-e02f11c3d0e2");
 }
-
-let index = 0;
 
 /* OPTIMIZAR */
 function opt(url){
@@ -175,11 +151,6 @@ return url.replace("/upload/","/upload/w_900,q_auto,f_auto/");
 return url;
 }
 
-/* PRECIO */
-const precio = p.PRECIO 
-? new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP'}).format(p.PRECIO)
-: "Consultar";
-
 /* MINIATURAS */
 const thumbs = fotos.map((f,i)=>`
 <img src="${opt(f)}" onclick="ir(${i})">
@@ -188,43 +159,27 @@ const thumbs = fotos.map((f,i)=>`
 /* RENDER */
 document.getElementById("contenido").innerHTML=`
 <div class="slider">
-<button class="flecha izq" onclick="prev()">←</button>
 <img id="img" src="${opt(fotos[0])}">
-<button class="flecha der" onclick="next()">→</button>
 </div>
 
 <div class="miniaturas">${thumbs}</div>
 
-<div class="info">
-<h1>${p.TITULO || "Sin título"}</h1>
-<p>${p.CIUDAD || ""}</p>
+<h1>${titulo || "Sin título"}</h1>
+<p>${ciudad}</p>
 <p class="price">${precio}</p>
 
-<a class="btn" href="https://wa.me/573016492983?text=Hola estoy interesado en ${p.TITULO}">
+<p>${descripcion}</p>
+
+<a class="btn" href="https://wa.me/573016492983?text=Hola estoy interesado en ${titulo}">
 WhatsApp
 </a>
-</div>
 `;
 
-/* FUNCIONES */
+/* CAMBIAR IMG */
 function ir(i){
-index=i;
-update();
+document.getElementById("img").src = opt(fotos[i]);
 }
 
-function next(){
-index=(index+1)%fotos.length;
-update();
-}
-
-function prev(){
-index=(index-1+fotos.length)%fotos.length;
-update();
-}
-
-function update(){
-document.getElementById("img").src = opt(fotos[index]);
-}
 </script>
 
 </body>
