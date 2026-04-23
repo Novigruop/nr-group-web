@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ficha propiedad</title>
+<title>Detalle propiedad</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
@@ -13,44 +13,61 @@
 body{
 font-family:Arial;
 background:#0b0b0b;
-color:#111;
+color:white;
+}
+
+/* HEADER */
+.header{
+position:fixed;
+top:0;
+width:100%;
+background:rgba(0,0,0,0.9);
+padding:15px 30px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+z-index:1000;
+}
+
+.header a{
+color:white;
+text-decoration:none;
+margin-left:20px;
 }
 
 /* BOTON VOLVER */
 .volver{
-position:fixed;
-top:20px;
-left:20px;
-background:#111;
-color:white;
-padding:10px 15px;
+background:#1a1a1a;
+padding:8px 14px;
 border-radius:8px;
 cursor:pointer;
-z-index:1000;
-font-size:14px;
 }
 
 /* CONTENEDOR */
 .container{
-max-width:900px;
-margin:80px auto;
+max-width:1000px;
+margin:100px auto 40px;
 padding:20px;
 }
 
 /* CARD */
 .card{
-background:white;
+background:#111;
 padding:20px;
-border-radius:12px;
-box-shadow:0 10px 30px rgba(0,0,0,0.4);
+border-radius:14px;
+box-shadow:0 10px 30px rgba(0,0,0,0.5);
 }
 
 /* SLIDER */
+.slider{
+position:relative;
+}
+
 .slider img{
 width:100%;
-height:400px;
+height:420px;
 object-fit:cover;
-border-radius:10px;
+border-radius:12px;
 }
 
 /* MINI */
@@ -62,10 +79,10 @@ overflow-x:auto;
 }
 
 .miniaturas img{
-width:80px;
-height:60px;
+width:90px;
+height:65px;
 object-fit:cover;
-border-radius:5px;
+border-radius:6px;
 cursor:pointer;
 opacity:.7;
 transition:0.3s;
@@ -79,51 +96,59 @@ transform:scale(1.05);
 /* INFO */
 h1{
 margin-top:20px;
-font-size:26px;
+font-size:28px;
 }
 
 .price{
-font-size:22px;
+font-size:24px;
 margin:10px 0;
+color:#c9a857;
 font-weight:bold;
 }
 
 .desc{
 margin-top:10px;
 line-height:1.6;
+color:#ddd;
 }
 
 /* BOTONES */
 .actions{
-margin-top:20px;
+margin-top:25px;
 display:flex;
 gap:10px;
 flex-wrap:wrap;
 }
 
 .btn{
-padding:10px 15px;
+padding:12px 18px;
 border:none;
 border-radius:8px;
 cursor:pointer;
 font-size:14px;
+font-weight:bold;
 }
 
 .copy{background:#333;color:white}
 .whatsapp{background:#25D366;color:white}
-.pdf{background:black;color:white}
+.pdf{background:#c9a857;color:black}
 
 /* MOBILE */
 @media(max-width:768px){
 .slider img{height:250px}
-.container{padding:15px}
+.container{margin-top:90px}
 }
 </style>
 </head>
 
 <body>
 
-<div class="volver" onclick="history.back()">← Volver</div>
+<div class="header">
+  <div class="volver" onclick="history.back()">← Volver</div>
+  <div>
+    <a href="index.html">Inicio</a>
+  </div>
+</div>
 
 <div class="container" id="ficha">
   <div class="card">
@@ -149,11 +174,13 @@ navigator.clipboard.writeText(urlActual);
 alert("Link copiado");
 }
 
-function compartir(){
-const texto = "Mira esta propiedad: " + urlActual;
-window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`);
+/* 🔥 WHATSAPP CON DATOS */
+function enviarWhatsApp(titulo, id){
+const mensaje = `Hola, estoy interesado en esta propiedad:\n\n🏡 ${titulo}\n🆔 ID: ${id}\n\n${urlActual}`;
+window.open(`https://wa.me/573016492983?text=${encodeURIComponent(mensaje)}`);
 }
 
+/* PDF */
 async function pdf(){
 
 const element=document.getElementById("ficha");
@@ -208,6 +235,7 @@ const precio = precioRaw
 ? new Intl.NumberFormat('es-CO',{style:'currency',currency:'COP'}).format(precioRaw)
 : "Consultar";
 
+/* FOTOS */
 const fotos = [
 p.FOTO1,p.FOTO2,p.FOTO3,p.FOTO4,
 p.FOTO5,p.FOTO6,p.FOTO7,p.FOTO8,
@@ -244,7 +272,11 @@ document.getElementById("contenido").innerHTML=`
 
 <div class="actions">
 <button class="btn copy" onclick="copiar()">Copiar link</button>
-<button class="btn whatsapp" onclick="compartir()">WhatsApp</button>
+
+<button class="btn whatsapp" onclick="enviarWhatsApp('${titulo}','${id}')">
+WhatsApp
+</button>
+
 <button class="btn pdf" onclick="pdf()">PDF</button>
 </div>
 `;
