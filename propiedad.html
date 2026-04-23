@@ -3,47 +3,31 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Detalle propiedad</title>
+<title>Ficha de propiedad</title>
+
+<!-- LIBRERÍA PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 
 body{
 font-family:Arial;
-background:#0b0b0b;
-color:white;
+background:white;
+color:#111;
 }
 
-/* HEADER */
-.header{
-position:fixed;
-top:0;
-width:100%;
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:15px 20px;
-background:rgba(0,0,0,0.85);
-z-index:1000;
-}
-
-.header a{
-color:white;
-text-decoration:none;
-margin-left:10px;
-}
-
-/* CONTENIDO */
+/* CONTENEDOR */
 .container{
 max-width:900px;
-margin:90px auto;
+margin:auto;
 padding:20px;
 }
 
 /* SLIDER */
 .slider img{
 width:100%;
-height:350px;
+height:400px;
 object-fit:cover;
 border-radius:10px;
 }
@@ -57,8 +41,8 @@ overflow-x:auto;
 }
 
 .miniaturas img{
-width:70px;
-height:50px;
+width:80px;
+height:60px;
 object-fit:cover;
 border-radius:5px;
 cursor:pointer;
@@ -67,65 +51,93 @@ opacity:.7;
 
 .miniaturas img:hover{opacity:1}
 
-.price{
-color:#c9a857;
-font-size:24px;
-margin:10px 0;
+/* INFO */
+h1{
+margin-top:20px;
+font-size:26px;
 }
 
-.btn{
-background:#25D366;
-padding:12px 20px;
-color:white;
-display:inline-block;
-border-radius:6px;
+.price{
+font-size:22px;
+margin:10px 0;
+font-weight:bold;
+}
+
+.desc{
+margin-top:10px;
+line-height:1.5;
+}
+
+/* BOTON PDF */
+.pdf-btn{
 margin-top:20px;
-text-decoration:none;
+padding:12px 20px;
+background:black;
+color:white;
+border:none;
+border-radius:6px;
+cursor:pointer;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+.slider img{height:250px}
 }
 </style>
 </head>
 
 <body>
 
-<div class="header">
-  <div><b>NR Group</b></div>
-  <div>
-    <a href="index.html">Inicio</a>
-  </div>
-</div>
-
-<div class="container">
+<div class="container" id="ficha">
   <div id="contenido"></div>
 </div>
 
 <script>
 
-/* TRAER DATA */
-let p = JSON.parse(localStorage.getItem("propiedad"));
+/* OBTENER ID */
+const params = new URLSearchParams(window.location.search);
+const id = params.get("id");
+
+/* VALIDACIÓN */
+if(!id){
+document.getElementById("contenido").innerHTML = `
+<h2>Propiedad no encontrada</h2>
+`;
+throw new Error("Sin ID");
+}
+
+/* CARGAR DATA */
+async function cargar(){
+
+const res = await fetch("https://script.google.com/macros/s/AKfycbwWFcQ1nlVsLyiEOFMvSbYAxPHdAqSvKP1qMCvp1BrQkhb6ctod8oSShrj1cBKWzSc/exec?action=read_propiedades");
+const json = await res.json();
+
+const data = json.data;
+
+/* BUSCAR PROPIEDAD */
+const p = data.find(x => 
+  String(x.ID || x.id || x.Id) === String(id)
+);
 
 if(!p){
-document.getElementById("contenido").innerHTML=`
-<h2>No se pudo cargar la propiedad</h2>
-<a href="index.html" class="btn">Volver</a>
+document.getElementById("contenido").innerHTML = `
+<h2>Propiedad no disponible</h2>
 `;
-throw new Error("Sin datos");
+return;
 }
 
-/* 🔥 NORMALIZAR CAMPOS */
+/* NORMALIZAR */
 function getCampo(obj, keys){
 for(let k of keys){
-if(obj[k] !== undefined && obj[k] !== ""){
-return obj[k];
-}
+if(obj[k]) return obj[k];
 }
 return "";
 }
 
-/* CAMPOS FLEXIBLES */
-const titulo = getCampo(p, ["TITULO","titulo","nombre","NOMBRE"]);
-const ciudad = getCampo(p, ["CIUDAD","ciudad"]);
-const precioRaw = getCampo(p, ["PRECIO","precio"]);
-const descripcion = getCampo(p, ["DESCRIPCION","descripcion"]);
+const titulo = getCampo(p,["TITULO","titulo","nombre"]);
+const ciudad = getCampo(p,["CIUDAD","ciudad"]);
+const precioRaw = getCampo(p,["PRECIO","precio"]);
+const descripcion = getCampo(p,["DESCRIPCION","descripcion"]);
 
 /* PRECIO */
 const precio = precioRaw
@@ -137,16 +149,16 @@ const fotos = [
 p.FOTO1,p.FOTO2,p.FOTO3,p.FOTO4,
 p.FOTO5,p.FOTO6,p.FOTO7,p.FOTO8,
 p.FOTO9,p.FOTO10
-].filter(f=>f && f.startsWith("http"));
+].filter(f => f && f.startsWith("http"));
 
-if(fotos.length===0){
+if(fotos.length === 0){
 fotos.push("https://images.unsplash.com/photo-1560448204-e02f11c3d0e2");
 }
 
 /* OPTIMIZAR */
 function opt(url){
 if(url.includes("res.cloudinary.com")){
-return url.replace("/upload/","/upload/w_900,q_auto,f_auto/");
+return url.replace("/upload/","/upload/w_1200,q_auto,f_auto/");
 }
 return url;
 }
@@ -157,29 +169,45 @@ const thumbs = fotos.map((f,i)=>`
 `).join("");
 
 /* RENDER */
-document.getElementById("contenido").innerHTML=`
+document.getElementById("contenido").innerHTML = `
 <div class="slider">
 <img id="img" src="${opt(fotos[0])}">
 </div>
 
 <div class="miniaturas">${thumbs}</div>
 
-<h1>${titulo || "Sin título"}</h1>
+<h1>${titulo}</h1>
 <p>${ciudad}</p>
 <p class="price">${precio}</p>
 
-<p>${descripcion}</p>
+<div class="desc">${descripcion}</div>
 
-<a class="btn" href="https://wa.me/573016492983?text=Hola estoy interesado en ${titulo}">
-WhatsApp
-</a>
+<button class="pdf-btn" onclick="descargarPDF()">📄 Descargar PDF</button>
 `;
 
-/* CAMBIAR IMG */
-function ir(i){
+/* CAMBIAR FOTO */
+window.ir = function(i){
 document.getElementById("img").src = opt(fotos[i]);
 }
 
+}
+
+cargar();
+
+/* GENERAR PDF */
+function descargarPDF(){
+
+const element = document.getElementById("ficha");
+
+html2pdf().set({
+  margin: 0.5,
+  filename: 'propiedad.pdf',
+  image: { type: 'jpeg', quality: 0.98 },
+  html2canvas: { scale: 2 },
+  jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+}).from(element).save();
+
+}
 </script>
 
 </body>
