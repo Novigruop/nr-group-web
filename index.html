@@ -28,10 +28,7 @@ padding:15px 40px;
 z-index:1000;
 }
 
-.logo{
-font-weight:bold;
-font-size:18px;
-}
+.logo{font-weight:bold;font-size:18px}
 
 /* MENU */
 .menu{
@@ -43,23 +40,29 @@ align-items:center;
 
 .menu li{
 position:relative;
-cursor:pointer;
 }
 
+/* CLICKABLE */
 .menu a{
 color:white;
 text-decoration:none;
+cursor:pointer;
 }
 
-/* DROPDOWN */
+/* DROPDOWN (FIX PRO) */
+.dropdown{
+position:relative;
+padding-bottom:15px; /* 🔥 evita que se cierre */
+}
+
 .submenu{
 position:absolute;
-top:40px;
+top:100%;
 left:0;
 background:white;
 color:black;
 list-style:none;
-padding:15px;
+padding:10px;
 border-radius:12px;
 display:none;
 min-width:180px;
@@ -67,14 +70,16 @@ box-shadow:0 10px 25px rgba(0,0,0,0.3);
 }
 
 .submenu li{
-padding:8px;
+padding:10px;
 border-radius:6px;
+cursor:pointer;
 }
 
 .submenu li:hover{
 background:#f2f2f2;
 }
 
+/* HOVER SOLIDO */
 .dropdown:hover .submenu{
 display:block;
 }
@@ -153,10 +158,7 @@ object-fit:cover;
 border-radius:10px;
 }
 
-.price{
-color:#c9a857;
-font-weight:bold;
-}
+.price{color:#c9a857;font-weight:bold}
 
 /* PREMIUM */
 .premium{
@@ -190,16 +192,12 @@ align-items:center;
 justify-content:center;
 border-radius:50%;
 text-decoration:none;
-box-shadow:0 5px 15px rgba(0,0,0,0.3);
 z-index:9999;
 }
 
 /* MOBILE */
 @media(max-width:768px){
-.menu{
-flex-direction:column;
-gap:10px;
-}
+.menu{flex-direction:column}
 .card{width:90%}
 .hero h1{font-size:24px}
 }
@@ -213,35 +211,37 @@ gap:10px;
   <div class="logo">NR Group</div>
 
   <ul class="menu">
-    <li><a href="#">Nosotros</a></li>
+    <li><a onclick="resetFiltro()">Inicio</a></li>
 
+    <!-- ARRIENDO -->
     <li class="dropdown">
-      <a href="#">Arriendo ▾</a>
+      <a>Arriendo ▾</a>
       <ul class="submenu">
-        <li>Apartamentos</li>
-        <li>Apartaestudios</li>
-        <li>Bodegas</li>
-        <li>Casas</li>
-        <li>Locales</li>
-        <li>Oficinas</li>
+        <li onclick="filtrarTipo('ARRIENDO','APARTAMENTO')">Apartamentos</li>
+        <li onclick="filtrarTipo('ARRIENDO','APARTAESTUDIO')">Apartaestudios</li>
+        <li onclick="filtrarTipo('ARRIENDO','BODEGA')">Bodegas</li>
+        <li onclick="filtrarTipo('ARRIENDO','CASA')">Casas</li>
+        <li onclick="filtrarTipo('ARRIENDO','LOCAL')">Locales</li>
+        <li onclick="filtrarTipo('ARRIENDO','OFICINA')">Oficinas</li>
       </ul>
     </li>
 
+    <!-- VENTA -->
     <li class="dropdown">
-      <a href="#">Venta ▾</a>
+      <a>Venta ▾</a>
       <ul class="submenu">
-        <li>Apartamentos</li>
-        <li>Apartaestudios</li>
-        <li>Bodegas</li>
-        <li>Casas</li>
-        <li>Locales</li>
-        <li>Oficinas</li>
+        <li onclick="filtrarTipo('VENTA','APARTAMENTO')">Apartamentos</li>
+        <li onclick="filtrarTipo('VENTA','APARTAESTUDIO')">Apartaestudios</li>
+        <li onclick="filtrarTipo('VENTA','BODEGA')">Bodegas</li>
+        <li onclick="filtrarTipo('VENTA','CASA')">Casas</li>
+        <li onclick="filtrarTipo('VENTA','LOCAL')">Locales</li>
+        <li onclick="filtrarTipo('VENTA','OFICINA')">Oficinas</li>
       </ul>
     </li>
 
-    <li><a href="#">Servicios</a></li>
-    <li><a href="#">Blog</a></li>
-    <li><a href="#">Contacto</a></li>
+    <li><a>Servicios</a></li>
+    <li><a>Blog</a></li>
+    <li><a>Contacto</a></li>
   </ul>
 </header>
 
@@ -265,7 +265,6 @@ gap:10px;
 
 </section>
 
-<!-- WHATSAPP -->
 <a href="https://wa.me/573016492983" target="_blank" class="wa-float">💬</a>
 
 <script>
@@ -302,23 +301,34 @@ const destacado = (p.DESTACADO || "").toUpperCase() === "SI";
 
 c.innerHTML+=`
 <div class="card ${destacado ? 'premium' : ''}">
-
 ${destacado ? '<div class="badge">⭐ PREMIUM</div>' : ''}
-
 <img src="${optimizar(img)}">
-
 <h3>${p.TITULO}</h3>
 <p>${p.CIUDAD}</p>
 <p class="price">${precio}</p>
-
-<a href="propiedad.html?id=${id}" class="btn">
-Ver propiedad
-</a>
+<a href="propiedad.html?id=${id}" class="btn">Ver propiedad</a>
 </div>
 `;
 });
 }
 
+/* FILTRO MENU */
+function filtrarTipo(tipo,categoria){
+const f = data.filter(p=>{
+return(
+p.TIPO?.toUpperCase() === tipo &&
+p.CATEGORIA?.toUpperCase().includes(categoria)
+);
+});
+render(f);
+}
+
+/* RESET */
+function resetFiltro(){
+render(data);
+}
+
+/* FILTROS MANUALES */
 function filtrar(){
 const ciudad=document.getElementById("filtroCiudad").value.toLowerCase();
 const precio=document.getElementById("filtroPrecio").value;
@@ -329,7 +339,6 @@ return(
 (!precio||p.PRECIO<=precio)
 );
 });
-
 render(f);
 }
 
